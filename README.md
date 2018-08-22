@@ -4,7 +4,7 @@ platforms: dotnet, c#
 author: easyj2j
 ---
 
-# Find Local Image Files with Faces
+# Face Finder
 
 This sample searches a folder for image files containing a face. Selected attributes of the image and face are displayed. Searches can be filtered by age range, gender, and whether the face matches a specified person. The sample uses the Windows client libraries for the Cognitive Services Computer Vision and Face services.
 
