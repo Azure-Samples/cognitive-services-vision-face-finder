@@ -1,0 +1,235 @@
+﻿<Window x:Class="FaceFinder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FaceFinder"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Face Finder" Icon="Assets/FaceFinder.ico" Width="1400" Height="900">
+    <Window.DataContext>
+        <local:ImageProcessor/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        
+        <!-- groupList -->
+        <DataTemplate x:Key="GroupTemplate" DataType="ImageInfo">
+            <StackPanel Orientation="Vertical"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" Width="120">
+                <Image x:Name="personThumbNail" Height="120" Margin="0,0,2,0" Stretch="UniformToFill">
+                    <Image.Source>
+                        <BitmapImage CacheOption="OnLoad" UriSource="{Binding FilePath}" />
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding FileName}" TextAlignment="Left"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- thumbList -->
+        <DataTemplate x:Key="ImageInfoTemplate" DataType="ImageInfo">
+            <StackPanel Orientation="Vertical" ToolTip="{Binding Caption}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
+                <Image x:Name="thumbNail" Width="100" Height="100" Margin="0" Stretch="UniformToFill"
+                       Visibility="{Binding ElementName=getThumbnail, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Image.Source>
+                        <BitmapImage CacheOption="OnLoad" UriSource="{Binding ThumbUrl}"/>
+                    </Image.Source>
+                </Image>
+                <TextBlock Text="{Binding FileName}"
+                           Visibility="{Binding ElementName=displayFileName, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding Attributes}"
+                           Visibility="{Binding ElementName=displayAttributes, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding Metadata}"
+                           Visibility="{Binding ElementName=getMetadata, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding OcrResult}"
+                           Visibility="{Binding ElementName=getOCR, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <!--TextBlock Text="{Binding Caption}"/-->
+            </StackPanel>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="ImagePanelTemplate">
+            <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+        </ItemsPanelTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--GridSplitter Grid.Row="1" Grid.Column="0" Panel.ZIndex="1"
+              HorizontalAlignment="Right" VerticalAlignment="Stretch"
+              Background="Blue" Width="1"/-->
+
+        <TextBlock Name="groupName" Grid.Row="0" Grid.Column="0" Text="{Binding ElementName=personName, Path=SelectedItem}"
+                   HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center"
+                   FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+
+        <Grid Name="topPanel" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Width="Auto">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="Background" Value="AliceBlue"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="Row1">
+                    <Setter Property="TextAlignment" Value="Center"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+                </Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}"/><!-- Allows use of Row1 wo specifying Style -->
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}" x:Key="Row0">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                </Style>
+            </Grid.Resources>
+            
+            <Button Grid.Row="0" Grid.Column="0" x:Name="selectFolderButton" Content="Select folder"
+                    Command="{Binding SelectFolderCommand}" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Name="fileCountLabel" Text="Files" Style="{StaticResource Row0}"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="imageFileCountLabel" Text="Image Files" Style="{StaticResource Row0}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Name="folderLabel" Text="{Binding SelectedFolder}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Name="fileCount" Text="{Binding FileCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Name="imageFileCount" Text="{Binding ImageCount, Mode=TwoWay}"/>
+            
+            <Button Grid.Row="0" Grid.Column="3" x:Name="findFacesButton" Content="Find faces" Margin="16,2,2,2"
+                    Command="{Binding FindFacesCommand}"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Name="processingLabel" Text="Processing" Style="{StaticResource Row0}"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Name="searchedLabel" Text="Face Images" Style="{StaticResource Row0}"/>
+            <TextBlock Grid.Row="0" Grid.Column="6" Name="faceImageCountLabel" Text="Matched Search" Style="{StaticResource Row0}"/>
+            <TextBlock Grid.Row="0" Grid.Column="7" Name="faceCountLabel" Text="Matched Face" Style="{StaticResource Row0}"/>
+
+            <Button Grid.Row="1" Grid.Column="3" x:Name="cancelButtton" Content="Cancel" Margin="16,2,2,2"
+                    Command="{Binding CancelFindFacesCommand}"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Name="processingCount" Text="{Binding ProcessingCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Name="searchCount" Text="{Binding SearchedCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="6" Name="faceImageCount" Text="{Binding FaceImageCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="7" Name="faceCount" Text="{Binding FaceCount, Mode=TwoWay}"/>
+        </Grid>
+
+        <ListBox Name="groupList" Grid.Row="1" Grid.Column="0" Width="130" Margin="4"
+                    ItemsSource="{Binding GroupInfos}"
+                    ItemTemplate="{StaticResource GroupTemplate}"
+                    HorizontalAlignment="Center"/>
+
+        <Image Name="splashImage" Grid.Row="1" Grid.Column="1" Margin="4"
+               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
+
+        <ListBox Name="thumbList" Grid.Row="1" Grid.Column="1" SelectionMode="Extended" Margin="4"
+                 ItemsSource="{Binding ImageInfos}"
+                 ItemTemplate="{StaticResource ImageInfoTemplate}"
+                 ItemsPanel="{StaticResource ImagePanelTemplate}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+        <Expander Name="settings" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Panel.ZIndex="1" Opacity=".96"
+                  Margin="8,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsExpanded="{Binding IsSettingsExpanded}">
+            <Expander.Header>
+                <TextBlock Padding="0,20,0,0"/>
+            </Expander.Header>
+            <Border CornerRadius="6" Padding="8"
+                    BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
+                <StackPanel Orientation="Vertical" Margin="0,0,0,0" Grid.ColumnSpan="2">
+                    <TextBlock Text="Computer Vision subscription key" Margin="0,10,0,0"/>
+                    <TextBox Text="{Binding ComputerVisionKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Computer Vision endpoint" Margin="0,4,0,0"/>
+                    <TextBox Text="{Binding ComputerVisionEndpoint, Mode=TwoWay}" MinWidth="260"/>
+
+                    <TextBlock Text="Face subscription key" Margin="0,10,0,0"/>
+                    <TextBox Text="{Binding FaceKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left"/>
+                    <TextBlock Text="Face endpoint" Margin="0,4,0,0"/>
+                    <TextBox Text="{Binding FaceEndpoint, Mode=TwoWay}" MinWidth="260"/>
+
+                    <CheckBox x:Name="searchSubfolders" Content="Search subfolders" IsChecked="{Binding SearchSubfolders}" IsEnabled="False" Margin="0,20,0,0"/>
+
+                    <CheckBox x:Name="displayFileName" Content="Display file name" IsChecked="{Binding DisplayFileName}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="displayAttributes" Content="Display age and gender" IsChecked="{Binding DisplayAttributes}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" IsEnabled="False" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getMetadata" Content="Get title and date taken" IsChecked="{Binding GetMetadata}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getOCR" Content="Get OCR" IsChecked="{Binding GetOCR}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getCaption" Content="Get caption (tool tip)" IsChecked="{Binding GetCaption}" Margin="0,10,0,0"/>
+
+                    <TextBlock Margin="0,20,0,4" Text="Search on gender"/>
+                    <StackPanel x:Name="searchGender" Orientation="Horizontal">
+                        <RadioButton x:Name="isMale" Content="Male" IsChecked="{Binding IsMale}" Margin="0,0,4,0"/>
+                        <RadioButton x:Name="isFemale" Content="Female" IsChecked="{Binding IsFemale}" Margin="8,0,4,0"/>
+                        <RadioButton Content="NA" Margin="8,0,4,0"/>
+                    </StackPanel>
+
+                    <CheckBox x:Name="searchAge" Margin="0,10,0,4" Content="Search on age range" IsChecked="{Binding SearchAge}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Width="24" Margin="4,0,0,4" Padding="10,0">
+                            <TextBlock.Text>
+                                <Binding ElementName="rangeSlider" Path="LowerValue"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <xctk:RangeSlider x:Name="rangeSlider" Width="200" Height="20" Minimum="0" Maximum="100" Step="5"
+                                          LowerValue="{Binding MinAge, Mode=TwoWay}" HigherValue="{Binding MaxAge, Mode=TwoWay}"
+                                          LowerRangeBackground="Bisque" RangeBackground="Salmon" HigherRangeBackground="Bisque"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Width="24" Margin="8,0,0,4">
+                            <TextBlock.Text>
+                                <Binding ElementName="rangeSlider" Path="HigherValue"/>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <CheckBox x:Name="matchFace" Content="Match face" IsChecked="{Binding MatchFace}"
+                              Margin="0,10,0,0" Width="Auto" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Border>
+        </Expander>
+
+        <Expander Name="personGroup" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Panel.ZIndex="1" ExpandDirection="Left" Opacity=".96"
+                  Margin="0,0,4,0" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Expander.Header>
+                <TextBlock Padding="32,0,0,0"/>
+            </Expander.Header>
+            <Border CornerRadius="6" Padding="8"
+                    BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
+                <StackPanel Orientation="Vertical" Margin="0,0,0,0" Grid.ColumnSpan="2" IsEnabled="{Binding ElementName=matchFace, Path=IsChecked}">
+                    <TextBlock Margin="0,4,0,0" Text="Select a person to search for" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
+
+                    <ComboBox x:Name="personName" Text="{Binding SearchedForPerson, UpdateSourceTrigger=LostFocus}"
+                              ItemsSource="{Binding GroupNames}"
+                              SelectedItem="{Binding SearchedForPerson}"
+                              IsEditable="True" Margin="0,12,0,2"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
+                        <Button x:Name="createGroupButton" Content="Create" Command="{Binding CreateGroupCommand}" Margin="0,0,0,0"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                        <Button x:Name="deleteGroupButton" Content="Delete" Command="{Binding DeleteGroupCommand}" Margin="32,0,0,0"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                    </StackPanel>
+
+                    <TextBlock Width="190" Margin="0,12,0,0" TextAlignment="Justify" TextWrapping="Wrap">
+                        Select one or more images of this person, using the Ctrl and Shift keys for multiple selections.
+                        Each selected image should contain only one face. When selection is complete, click
+                    </TextBlock>
+                    <Button x:Name="addToGroupButton" Content="Add to group" Margin="0,8,0,0"
+                            Command="{Binding AddToGroupCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
+                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+
+                    <TextBlock Text="Now rerun 'Find faces' to see other images matching this person."
+                               Width="190" Margin="0,8,0,4" TextAlignment="Justify" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </Expander>
+    </Grid>
+</Window>
