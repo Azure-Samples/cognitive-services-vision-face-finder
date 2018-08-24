@@ -67,86 +67,9 @@
               HorizontalAlignment="Right" VerticalAlignment="Stretch"
               Background="Blue" Width="1"/-->
 
-        <TextBlock Name="groupName" Grid.Row="0" Grid.Column="0" Text="{Binding SearchedForPerson}"
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center"
-                   FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+        <TextBlock Name="spacer" Grid.Row="0" Grid.Column="0" Text="" Margin="0,4"/>
 
-        <Grid Name="bottomPanel" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Width="Auto" Margin="0,2,0,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="FontWeight" Value="Bold"/>
-                    <Setter Property="FontSize" Value="13"/>
-                    <Setter Property="Margin" Value="2"/>
-                    <Setter Property="Padding" Value="4,2"/>
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                    <Setter Property="Background" Value="Bisque"/>
-                </Style>
-                <Style TargetType="TextBlock" x:Key="Row1">
-                    <Setter Property="TextAlignment" Value="Center"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                    <Setter Property="FontSize" Value="13"/>
-                    <Setter Property="Margin" Value="2"/>
-                    <Setter Property="Padding" Value="4,2"/>
-                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
-                </Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}"/><!-- Allows use of Row1 wo specifying Style -->
-                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}" x:Key="Row0">
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                </Style>
-            </Grid.Resources>
-            
-            <Button Grid.Row="0" Grid.Column="0" x:Name="selectFolderButton" Content="Select Folder"
-                    ToolTip="containing images to search for faces"
-                    Command="{Binding SelectFolderCommand}"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Name="fileCountLabel" Text="Files" Style="{StaticResource Row0}"
-                       ToolTip="total files in folder"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Name="imageFileCountLabel" Text="Image Files" Style="{StaticResource Row0}"
-                       ToolTip="total image files in folder"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Name="folderLabel" Text="{Binding SelectedFolder}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Name="fileCount" Text="{Binding FileCount, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Name="imageFileCount" Text="{Binding ImageCount, Mode=TwoWay}"/>
-            
-            <Button Grid.Row="0" Grid.Column="3" x:Name="findFacesButton" Content="Find Faces" Margin="12,2,2,2"
-                    Command="{Binding FindFacesCommand}"/>
-            <TextBlock Grid.Row="0" Grid.Column="4" Name="processingLabel" Text="Processed" Style="{StaticResource Row0}"/>
-            <TextBlock Grid.Row="0" Grid.Column="5" Name="searchedLabel" Text="Face Images" Style="{StaticResource Row0}"
-                       ToolTip="total image files in folder containing a face"/>
-            <TextBlock Grid.Row="0" Grid.Column="6" Name="faceImageCountLabel" Text="Matched Search" Style="{StaticResource Row0}"
-                       ToolTip="total image files matching search criteria"/>
-            <TextBlock Grid.Row="0" Grid.Column="7" Name="faceCountLabel" Text="Matched Person" Style="{StaticResource Row0}"
-                       ToolTip="total image files matching selected person"/>
-
-            <Button Grid.Row="1" Grid.Column="3" x:Name="cancelButtton" Content="Cancel" Margin="12,2,2,2"
-                    Command="{Binding CancelFindFacesCommand}"/>
-            <TextBlock Grid.Row="1" Grid.Column="4" Name="processingCount" Text="{Binding ProcessingCount, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="1" Grid.Column="5" Name="searchCount" Text="{Binding SearchedCount, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="1" Grid.Column="6" Name="faceImageCount" Text="{Binding FaceImageCount, Mode=TwoWay}"/>
-            <TextBlock Grid.Row="1" Grid.Column="7" Name="faceCount" Text="{Binding FaceCount, Mode=TwoWay}"/>
-        </Grid>
-
-        <ListBox Name="groupList" Grid.Row="1" Grid.Column="0" Width="130" Margin="6,4,4,4"
-                    ItemsSource="{Binding GroupInfos}"
-                    ItemTemplate="{StaticResource GroupTemplate}"
-                    HorizontalAlignment="Center"/>
-
-        <Image Name="splashImage" Grid.Row="1" Grid.Column="1" Margin="4"
-               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
-
-        <ListBox Name="thumbList" Grid.Row="1" Grid.Column="1" SelectionMode="Extended" Margin="4,4,6,4"
-                 ItemsSource="{Binding ImageInfos}"
-                 ItemTemplate="{StaticResource ImageInfoTemplate}"
-                 ItemsPanel="{StaticResource ImagePanelTemplate}"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
-
-        <Expander Name="settings" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" ExpandDirection="Left" Panel.ZIndex="1" Opacity=".96"
+        <Expander Name="settings" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" ExpandDirection="Left" Panel.ZIndex="2" Opacity=".96"
                   Margin="0,0,12,0" Padding="10,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" IsExpanded="{Binding IsSettingsExpanded}">
             <Border CornerRadius="6" Padding="6"
                     BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
@@ -228,5 +151,84 @@
                 </StackPanel>
             </Border>
         </Expander>
+
+        <ListBox Name="groupList" Grid.Row="1" Grid.Column="0" Width="130" Margin="6,4,4,4"
+                    ItemsSource="{Binding GroupInfos}"
+                    ItemTemplate="{StaticResource GroupTemplate}"
+                    HorizontalAlignment="Center"/>
+
+        <Image Name="splashImage" Grid.Row="1" Grid.Column="1" Margin="4"
+               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
+
+        <ListBox Name="thumbList" Grid.Row="1" Grid.Column="1" SelectionMode="Extended" Margin="4,4,6,4"
+                 ItemsSource="{Binding ImageInfos}"
+                 ItemTemplate="{StaticResource ImageInfoTemplate}"
+                 ItemsPanel="{StaticResource ImagePanelTemplate}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+        <TextBlock Name="groupName" Grid.Row="2" Grid.Column="0" Text="{Binding SearchedForPerson}"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center"
+                   FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+
+        <Grid Name="bottomPanel" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Width="Auto" Margin="0,2,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                    <Setter Property="Background" Value="Bisque"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="Row1">
+                    <Setter Property="TextAlignment" Value="Center"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="13"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+                </Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}"/><!-- Allows use of Row1 wo specifying Style -->
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Row1}" x:Key="Row0">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                </Style>
+            </Grid.Resources>
+            
+            <Button Grid.Row="0" Grid.Column="0" x:Name="selectFolderButton" Content="Select Folder"
+                    ToolTip="containing images to search for faces"
+                    Command="{Binding SelectFolderCommand}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Name="fileCountLabel" Text="Files" Style="{StaticResource Row0}"
+                       ToolTip="total files in folder"/>
+            <TextBlock Grid.Row="0" Grid.Column="2" Name="imageFileCountLabel" Text="Image Files" Style="{StaticResource Row0}"
+                       ToolTip="total image files in folder"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Name="folderLabel" Text="{Binding SelectedFolder}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Name="fileCount" Text="{Binding FileCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Name="imageFileCount" Text="{Binding ImageCount, Mode=TwoWay}"/>
+            
+            <Button Grid.Row="0" Grid.Column="3" x:Name="findFacesButton" Content="Find Faces" Margin="12,2,2,2"
+                    Command="{Binding FindFacesCommand}"/>
+            <TextBlock Grid.Row="0" Grid.Column="4" Name="processingLabel" Text="Processed" Style="{StaticResource Row0}"/>
+            <TextBlock Grid.Row="0" Grid.Column="5" Name="searchedLabel" Text="Face Images" Style="{StaticResource Row0}"
+                       ToolTip="total image files in folder containing a face"/>
+            <TextBlock Grid.Row="0" Grid.Column="6" Name="faceImageCountLabel" Text="Matched Search" Style="{StaticResource Row0}"
+                       ToolTip="total image files matching search criteria"/>
+            <TextBlock Grid.Row="0" Grid.Column="7" Name="faceCountLabel" Text="Matched Person" Style="{StaticResource Row0}"
+                       ToolTip="total image files matching selected person"/>
+
+            <Button Grid.Row="1" Grid.Column="3" x:Name="cancelButtton" Content="Cancel" Margin="12,2,2,2"
+                    Command="{Binding CancelFindFacesCommand}"/>
+            <TextBlock Grid.Row="1" Grid.Column="4" Name="processingCount" Text="{Binding ProcessingCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="5" Name="searchCount" Text="{Binding SearchedCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="6" Name="faceImageCount" Text="{Binding FaceImageCount, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="1" Grid.Column="7" Name="faceCount" Text="{Binding FaceCount, Mode=TwoWay}"/>
+        </Grid>
     </Grid>
 </Window>
