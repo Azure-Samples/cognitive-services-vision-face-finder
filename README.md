@@ -6,7 +6,7 @@ author: easyj2j
 
 # Face Finder
 
-This sample searches a folder for image files containing a face. Selected attributes of the image and face are displayed. Searches can be filtered by age range, gender, and whether the face matches a specified person. The sample uses the Windows client libraries for the Cognitive Services Computer Vision and Face services.
+This sample searches a folder for image files containing a face. Selected attributes of the image and face are displayed. Searches can be filtered by age range, gender, and whether the face matches a specified person. The sample uses the Windows client libraries for the Computer Vision and Face services of Microsoft Cognitive Services.
 
 ## Features
 
@@ -24,8 +24,6 @@ This sample searches a folder for image files containing a face. Selected attrib
   * matching person/face
 * Finds all images containing a face that matches a specified person. A "person" is created by selecting one or more known images of the person. Alternatively, the first image of a person found in a folder can be used.
 
-![Screenshot](FaceFinder/Assets/FaceFinder.jpg)
-
 ## Getting Started
 
 ### Prerequisites
@@ -37,13 +35,12 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 1. Clone or download the repository.
 1. Open the *FaceFinder* folder in the repository.
-1. Double-click the *FaceFinder.sln* file, which opens in Visual Studio.
+1. Double-click the *FaceFinder.sln* file, which opens the project in Visual Studio.
 1. Build the project, which installs the Computer Vision and Face service NuGet packages.
 1. Run the program.
 
-1. Click the drop-down button on the upper left of the screen, which opens a dialog box.
+1. Click the expander button on the upper right of the screen.
 1. Insert your valid subscription keys and associated endpoints. The keys and endpoints are stored in **IsolatedStorage**.
-1. Click the drop-down button again to close the dialog box.
 1. Click **Select folder** and browse to a folder that you want to search for images containing faces.
 1. Click **Find faces**, which searches the folder for image files and then analyzes these files for faces. Images found with faces are displayed along with information about the faces. By default, the file name, gender, and age are displayed.
 
@@ -51,7 +48,7 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 * Performance is related to image size due to uploading and processing time. Small images on the order of 20 KB can provide good results.
 * Image metadata is not available.
-* Person Group thumbnails aren't displayed (but still used) after changing the Person and then returning to the previous Person.
+* Images associated with a person aren't displayed (but still used for matching) after selecting a different person and then returning to the previous person.
 * Future features:
   * Persistence of settings other than subscription keys and endpoints
   * Search subfolders
