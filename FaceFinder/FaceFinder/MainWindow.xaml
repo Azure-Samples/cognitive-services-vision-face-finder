@@ -66,7 +66,7 @@
               HorizontalAlignment="Right" VerticalAlignment="Stretch"
               Background="Blue" Width="1"/-->
 
-        <TextBlock Name="groupName" Grid.Row="0" Grid.Column="0" Text="{Binding ElementName=personName, Path=SelectedItem}"
+        <TextBlock Name="groupName" Grid.Row="0" Grid.Column="0" Text="{Binding SearchedForPerson}"
                    HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Center"
                    FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
 
@@ -156,16 +156,16 @@
                     <TextBlock Text="Face endpoint" Margin="0,4,0,0"/>
                     <TextBox Text="{Binding FaceEndpoint, Mode=TwoWay}" MinWidth="260"/>
 
-                    <CheckBox x:Name="searchSubfolders" Content="Search subfolders" IsChecked="{Binding SearchSubfolders}" IsEnabled="False" Margin="0,20,0,0"/>
+                    <CheckBox x:Name="searchSubfolders" Content="Search subfolders" IsChecked="{Binding SearchSubfolders}" IsEnabled="False" Margin="0,18,0,0"/>
 
-                    <CheckBox x:Name="displayFileName" Content="Display file name" IsChecked="{Binding DisplayFileName}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="displayFileName" Content="Display file name" IsChecked="{Binding DisplayFileName}" Margin="0,16,0,0"/>
                     <CheckBox x:Name="displayAttributes" Content="Display age and gender" IsChecked="{Binding DisplayAttributes}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" IsEnabled="False" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getMetadata" Content="Get title and date taken" IsChecked="{Binding GetMetadata}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getOCR" Content="Get OCR" IsChecked="{Binding GetOCR}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getCaption" Content="Get caption (tool tip)" IsChecked="{Binding GetCaption}" Margin="0,10,0,0"/>
 
-                    <TextBlock Margin="0,20,0,4" Text="Search on gender"/>
+                    <TextBlock Margin="0,16,0,4" Text="Search on gender"/>
                     <StackPanel x:Name="searchGender" Orientation="Horizontal">
                         <RadioButton x:Name="isMale" Content="Male" IsChecked="{Binding IsMale}" Margin="0,0,4,0"/>
                         <RadioButton x:Name="isFemale" Content="Female" IsChecked="{Binding IsFemale}" Margin="8,0,4,0"/>
@@ -203,13 +203,12 @@
             </Expander.Header>
             <Border CornerRadius="6" Padding="8"
                     BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
-                <StackPanel Orientation="Vertical" Margin="0,0,0,0" Grid.ColumnSpan="2" IsEnabled="{Binding ElementName=matchFace, Path=IsChecked}">
+                <StackPanel Orientation="Vertical" Margin="0,0,0,0" Grid.ColumnSpan="2">
                     <TextBlock Margin="0,4,0,0" Text="Select a person to search for" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
 
                     <ComboBox x:Name="personName" Text="{Binding SearchedForPerson, UpdateSourceTrigger=LostFocus}"
-                              ItemsSource="{Binding GroupNames}"
-                              SelectedItem="{Binding SearchedForPerson}"
-                              IsEditable="True" Margin="0,12,0,2"/>
+                              ItemsSource="{Binding GroupNames}" IsEditable="True" Margin="0,12,0,2"
+                              SelectedItem="{Binding SearchedForPerson}"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
                         <Button x:Name="createGroupButton" Content="Create" Command="{Binding CreateGroupCommand}" Margin="0,0,0,0"

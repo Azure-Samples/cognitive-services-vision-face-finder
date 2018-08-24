@@ -135,13 +135,7 @@ namespace FaceFinder
             set => SetProperty(ref faceCount, value);
         }
 
-        private string personGroupName = "Person Group";
-        public string PersonGroupName
-        {
-            get => personGroupName;
-            set => SetProperty(ref personGroupName, value);
-        }
-        private string searchedForPerson = string.Empty;
+        private string searchedForPerson = "Faces to Match";
         public string SearchedForPerson
         {
             get => searchedForPerson;

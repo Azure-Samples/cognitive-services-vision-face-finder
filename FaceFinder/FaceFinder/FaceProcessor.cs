@@ -99,7 +99,8 @@ namespace FaceFinder
             return false;
         }
 
-        public async Task CreatePersonGroupAsync(string name, ObservableCollection<ImageInfo> GroupInfos)
+        public async Task CreatePersonGroupAsync(string name,
+            ObservableCollection<ImageInfo> GroupInfos)
         {
             if (string.IsNullOrWhiteSpace(name)) { return; }
 
@@ -137,11 +138,11 @@ namespace FaceFinder
             try
             {
                 await faceClient.PersonGroup.CreateAsync(
-                    personGroupId, PersonGroupName, string.Empty);
+                    personGroupId, PersonGroupName, personName);
 
                 // Limit to 1 Person per group.
                 searchedForPerson = await faceClient.PersonGroupPerson.CreateAsync(
-                    personGroupId, personName, string.Empty);
+                    personGroupId, personName, "someData");
                 GroupInfos.Clear();
             }
             catch (APIErrorException ae)
@@ -153,7 +154,8 @@ namespace FaceFinder
         }
 
         // Each image must contain only 1 detected face.
-        public async Task AddFacesToPersonGroupAsync(string personName, IList<ImageInfo> selectedItems, ObservableCollection<ImageInfo> GroupInfos)
+        public async Task AddFacesToPersonGroupAsync(string personName,
+            IList<ImageInfo> selectedItems, ObservableCollection<ImageInfo> GroupInfos)
         {
             if(!await VerifyPersonGroupAsync(personName)) { return; }
 
@@ -214,9 +216,8 @@ namespace FaceFinder
 
         public void DisplayFacesInGroup(string userData, ObservableCollection<ImageInfo> GroupInfos)
         {
-            string[] filePaths = userData?.Split(
-                new char[] { USERDATA_DELIMITER }, StringSplitOptions.RemoveEmptyEntries) ??
-                Array.Empty<string>();
+            string[] filePaths =
+                userData?.Split(new char[] { USERDATA_DELIMITER }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
             foreach (string path in filePaths)
             {
                 ImageInfo groupInfo = new ImageInfo();
