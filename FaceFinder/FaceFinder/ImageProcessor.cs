@@ -135,7 +135,7 @@ namespace FaceFinder
             set => SetProperty(ref faceCount, value);
         }
 
-        private string searchedForPerson = "Faces to Match";
+        private string searchedForPerson;
         public string SearchedForPerson
         {
             get => searchedForPerson;
@@ -234,13 +234,18 @@ namespace FaceFinder
         public bool MatchFace
         {
             get => matchFace;
+            set => SetProperty(ref matchFace, value);
+        }
+
+        private bool isPersonComboBoxOpen;
+        public bool IsPersonComboBoxOpen
+        {
+            get => isPersonComboBoxOpen;
             set
             {
-                SetProperty(ref matchFace, value);
-                GetGroupNamesAsync();
-                //CreateGroupCommand.Execute(searchedForPerson);
+                SetProperty(ref isPersonComboBoxOpen, value);
+                if (value) { GetGroupNamesAsync(); }
             }
-            //set => SetProperty(ref searchFaces, value);
         }
 
         private double minAge = 10, maxAge = 80;
@@ -654,6 +659,8 @@ namespace FaceFinder
             if (string.IsNullOrWhiteSpace(SearchedForPerson)) { return; }
 
             IList selectedItems = (IList)selectedThumbnails;
+            if(selectedItems.Count == 0) { return; }
+
             IList<ImageInfo> items = selectedItems.Cast<ImageInfo>().ToList();
             await faceProcessor.AddFacesToPersonGroupAsync(SearchedForPerson, items, GroupInfos);
         }
