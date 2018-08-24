@@ -49,9 +49,9 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 ## Known issues
 
-* The sample has had little testing. Report bugs in the Issues section.
+* Performance is related to image size due to uploading and processing time. Small images on the order of 20 KB can provide good results.
 * Image metadata is not available.
-* Person Group thumbnails aren't displayed (but still used) after changing the Person Group and then returning to the previous Person Group.
+* Person Group thumbnails aren't displayed (but still used) after changing the Person and then returning to the previous Person.
 * Future features:
   * Persistence of settings other than subscription keys and endpoints
   * Search subfolders
@@ -63,7 +63,6 @@ This sample searches a folder for image files containing a face. Selected attrib
 ## Resources
 
 * [Included Help guide](HELP.md)
-* Video demonstrating use of the sample
 * [Computer Vision service documentation](https://docs.microsoft.com/azure/cognitive-services/computer-vision/)
 * [Computer Vision API - v2.0](https://westus.dev.cognitive.microsoft.com/docs/services/5adf991815e1060e6355ad44/operations/56f91f2e778daf14a499e1fa)
 * [Microsoft.Azure.CognitiveServices.Vision.ComputerVision 3.2.0](https://www.nuget.org/packages/Microsoft.Azure.CognitiveServices.Vision.ComputerVision/3.2.0) client library NuGet package
