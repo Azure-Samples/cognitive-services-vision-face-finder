@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
@@ -504,11 +505,15 @@ namespace FaceFinder
                 // Catch and display Face errors.
                 catch (APIErrorException fe)
                 {
+                    Debug.WriteLine("ProcessImageFilesForFacesAsync: {0}", fe.Message);
                     MessageBox.Show(fe.Message, "ProcessImageFilesForFacesAsync");
+                    break;
                 }
                 catch (Exception e)
                 {
+                    Debug.WriteLine("ProcessImageFilesForFacesAsync: {0}", e.Message);
                     MessageBox.Show(e.Message, "ProcessImageFilesForFacesAsync");
+                    break;
                 }
             }
         }
@@ -535,7 +540,8 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                MessageBox.Show(cve.Message, "ProcessImageFileForThumbAsync");
+                Debug.WriteLine("ProcessImageFileForThumbAsync: {0}", cve.Message);
+                //MessageBox.Show(cve.Message, "ProcessImageFileForThumbAsync");
                 return string.Empty;
             }
         }
@@ -561,7 +567,8 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                MessageBox.Show(cve.Message, "ProcessImageFileForCaptionAsync");
+                Debug.WriteLine("ProcessImageFileForCaptionAsync: {0}", cve.Message);
+                //MessageBox.Show(cve.Message, "ProcessImageFileForCaptionAsync");
             }
             return caption;
         }
@@ -599,7 +606,8 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                MessageBox.Show(cve.Message, "ProcessImageFileForTextAsync");
+                Debug.WriteLine("ProcessImageFileForTextAsync: {0}", cve.Message);
+                //MessageBox.Show(cve.Message, "ProcessImageFileForTextAsync");
             }
             return ocrResult;
         }

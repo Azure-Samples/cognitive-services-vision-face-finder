@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -47,6 +48,7 @@ namespace FaceFinder
             }
             catch (APIErrorException e)
             {
+                Debug.WriteLine("GetAllPersonGroupsAsync: {0}", e.Message);
                 MessageBox.Show(e.Message, "GetAllPersonGroupsAsync");
             }
             return new List<PersonGroup>();
@@ -66,6 +68,7 @@ namespace FaceFinder
             }
             catch (APIErrorException e)
             {
+                Debug.WriteLine("GetAllPersonGroupsNamesAsync: {0}", e.Message);
                 MessageBox.Show(e.Message, "GetAllPersonGroupsAsync");
             }
             return personGroupNames;
@@ -94,6 +97,7 @@ namespace FaceFinder
             }
             catch (APIErrorException e)
             {
+                Debug.WriteLine("VerifyPersonGroupAsync: {0}", e.Message);
                 MessageBox.Show(e.Message, "VerifyPersonGroupAsync");
             }
             return false;
@@ -130,6 +134,7 @@ namespace FaceFinder
                 if(ae.Response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
                     personGroupId = string.Empty;
+                    Debug.WriteLine("CreatePersonGroupAsync: {0}", ae.Message);
                     MessageBox.Show(ae.Message, "CreatePersonGroupAsync");
                     return;
                 }
@@ -148,6 +153,7 @@ namespace FaceFinder
             catch (APIErrorException ae)
             {
                 personGroupId = string.Empty;
+                Debug.WriteLine("CreatePersonGroupAsync: {0}", ae.Message);
                 MessageBox.Show(ae.Message, "CreatePersonGroupAsync");
                 return;
             }
@@ -245,10 +251,12 @@ namespace FaceFinder
             }
             catch (APIErrorException ae)
             {
+                Debug.WriteLine("DeletePersonGroupAsync: {0}", ae.Message);
                 MessageBox.Show(ae.Message, "DeletePersonGroupAsync");
             }
             catch (Exception e)
             {
+                Debug.WriteLine("DeletePersonGroupAsync: {0}", e.Message);
                 MessageBox.Show(e.Message, "DeletePersonGroupAsync");
             }
         }
