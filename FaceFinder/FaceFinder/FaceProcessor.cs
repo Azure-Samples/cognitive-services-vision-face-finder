@@ -18,15 +18,17 @@ namespace FaceFinder
     /// </summary>
     class FaceProcessor : ViewModelBase
     {
-        private const char USERDATA_DELIMITER = '<';
+        private const char FACE_DELIMITER = '<';
 
         private IFaceClient faceClient;
 
         private string personGroupId = string.Empty;
         private string personGroupName = "PersonGroup";
-        private Person searchedForPerson = new Person(Guid.Empty, string.Empty, string.Empty);
+        private readonly Person defaultEmptyPerson = new Person(Guid.Empty, string.Empty);
+        private Person searchedForPerson;
 
-        // A trained PersonGroup has at least 1 added face and has successfully completed the training process at least once.
+        // A trained PersonGroup has at least 1 added face and has 
+        // successfully completed the training process at least once.
         public bool IsPersonGroupTrained { get; private set; }
 
         public string PersonGroupName
@@ -38,6 +40,7 @@ namespace FaceFinder
         public FaceProcessor()
         {
             faceClient = ((App)Application.Current).faceClient;
+            searchedForPerson = defaultEmptyPerson;
         }
 
         public async Task<IList<PersonGroup>> GetAllPersonGroupsAsync()
@@ -48,7 +51,7 @@ namespace FaceFinder
             }
             catch (APIErrorException e)
             {
-                Debug.WriteLine("GetAllPersonGroupsAsync: {0}", e.Message);
+                Debug.WriteLine("GetAllPersonGroupsAsync: " + e.Message);
                 MessageBox.Show(e.Message, "GetAllPersonGroupsAsync");
             }
             return new List<PersonGroup>();
@@ -68,7 +71,7 @@ namespace FaceFinder
             }
             catch (APIErrorException e)
             {
-                Debug.WriteLine("GetAllPersonGroupsNamesAsync: {0}", e.Message);
+                Debug.WriteLine("GetAllPersonGroupsNamesAsync: " + e.Message);
                 MessageBox.Show(e.Message, "GetAllPersonGroupsAsync");
             }
             return personGroupNames;
@@ -90,23 +93,26 @@ namespace FaceFinder
                     {
                         personGroupId = group.PersonGroupId;
                         personGroupName = groupName;
-                        searchedForPerson = (await faceClient.PersonGroupPerson.ListAsync(personGroupId))[0];
+                        searchedForPerson =
+                            (await faceClient.PersonGroupPerson.ListAsync(personGroupId))[0];
                         return true;
                     }
                 }
             }
             catch (APIErrorException e)
             {
-                Debug.WriteLine("VerifyPersonGroupAsync: {0}", e.Message);
+                Debug.WriteLine("VerifyPersonGroupAsync: " + e.Message);
                 MessageBox.Show(e.Message, "VerifyPersonGroupAsync");
             }
             return false;
         }
 
-        public async Task CreatePersonGroupAsync(string name,
+        public async Task GetOrCreatePersonGroupAsync(string name,
             ObservableCollection<ImageInfo> GroupInfos)
         {
             if (string.IsNullOrWhiteSpace(name)) { return; }
+
+            searchedForPerson = defaultEmptyPerson;
 
             string personName = ConfigurePersonName(name);
 
@@ -115,11 +121,22 @@ namespace FaceFinder
             // lowercase char, digit, '-', or '_'; maximum length 64
             personGroupId = PersonGroupName + "-id";
 
+            // Get existing PersonGroup.
             PersonGroup group;
             try
             {
                 group = await faceClient.PersonGroup.GetAsync(personGroupId);
                 IList<Person> people = await faceClient.PersonGroupPerson.ListAsync(personGroupId);
+                if(people.Count == 0)
+                {
+                    // Invalid PersonGroup
+                    Debug.WriteLine("GetOrCreatePersonGroupAsync: " +
+                        "No PersonGroupPerson associated with PersonGroup; deleting PersonGroup");
+                    MessageBox.Show("Invalid PersonGroup, deleting", "GetOrCreatePersonGroupAsync");
+                    await DeletePersonGroupAsync(name, false);
+                    return;
+                }
+
                 searchedForPerson = people[0];
 
                 if(searchedForPerson.PersistedFaceIds.Count > 0)
@@ -134,27 +151,39 @@ namespace FaceFinder
                 if(ae.Response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
                     personGroupId = string.Empty;
-                    Debug.WriteLine("CreatePersonGroupAsync: {0}", ae.Message);
-                    MessageBox.Show(ae.Message, "CreatePersonGroupAsync");
+                    Debug.WriteLine("GetOrCreatePersonGroupAsync: " + ae.Message);
+                    MessageBox.Show(ae.Message, "GetOrCreatePersonGroupAsync");
                     return;
                 }
             }
 
+            // No existing PersonGroup; create one.
             try
             {
-                await faceClient.PersonGroup.CreateAsync(
-                    personGroupId, PersonGroupName, personName);
-
-                // Limit to 1 Person per group.
-                searchedForPerson = await faceClient.PersonGroupPerson.CreateAsync(
-                    personGroupId, personName, "someData");
-                GroupInfos.Clear();
+                await faceClient.PersonGroup.CreateAsync(personGroupId, PersonGroupName);
             }
             catch (APIErrorException ae)
             {
                 personGroupId = string.Empty;
-                Debug.WriteLine("CreatePersonGroupAsync: {0}", ae.Message);
-                MessageBox.Show(ae.Message, "CreatePersonGroupAsync");
+                Debug.WriteLine("GetOrCreatePersonGroupAsync: " + ae.Message);
+                MessageBox.Show(ae.Message, "GetOrCreatePersonGroupAsync");
+                return;
+            }
+
+            // PersonGroup successfully created. Create PersonGroupPerson (1 per PersonGroup)
+            try
+            {
+                searchedForPerson = await faceClient.PersonGroupPerson.CreateAsync(
+                    personGroupId, personName);
+                GroupInfos.Clear();
+                return;
+            }
+            catch (APIErrorException ae)
+            {
+                await faceClient.PersonGroup.DeleteAsync(personGroupId);
+                personGroupId = string.Empty;
+                Debug.WriteLine("GetOrCreatePersonGroupAsync: " + ae.Message);
+                MessageBox.Show(ae.Message, "GetOrCreatePersonGroupAsync");
                 return;
             }
         }
@@ -166,6 +195,7 @@ namespace FaceFinder
             if(!await VerifyPersonGroupAsync(personName)) { return; }
 
             string userData = searchedForPerson.UserData;
+            Debug.WriteLine("Before adding, PersistedFaceIds.Count: " + searchedForPerson.PersistedFaceIds.Count);
 
             int newFaces = 0;
 
@@ -173,30 +203,35 @@ namespace FaceFinder
             {
                 string imagePath = info.FilePath;
 
-                // Face already in Person
-                if (userData?.Contains(imagePath) ?? false) { continue; }
+                // HIGH: userData always null -> adds duplicates
+                
+                if (userData?.Contains(imagePath) ?? false) { continue; } // Face already added to Person
 
                 using (FileStream stream = new FileStream(info.FilePath, FileMode.Open))
                 {
                     PersistedFace persistedFace =
                         await faceClient.PersonGroupPerson.AddFaceFromStreamAsync(
                             personGroupId, searchedForPerson.PersonId, stream,
-                            imagePath + USERDATA_DELIMITER.ToString());
+                            imagePath + FACE_DELIMITER.ToString());
                 }
 
                 newFaces++;
                 GroupInfos.Add(info);
             }
+            Debug.WriteLine("After adding, PersistedFaceIds.Count: " + searchedForPerson.PersistedFaceIds.Count);
 
-            if(newFaces == 0)
+            // TODO: PersistedFaceIds.Count doesn't show results of current additions
+            //if(searchedForPerson.PersistedFaceIds.Count == 0)
+            if (newFaces == 0)
             {
-                IsPersonGroupTrained = true;
+                // TODO: shouldn't get here until userData works (trying to add same image)
+                IsPersonGroupTrained = (searchedForPerson.PersistedFaceIds.Count > 0);
                 return;
             }
 
-
             await faceClient.PersonGroup.TrainAsync(personGroupId);
 
+            // TODO: add progress indicator
             TrainingStatus trainingStatus = null;
             do
             {
@@ -204,16 +239,27 @@ namespace FaceFinder
                 await Task.Delay(1000);
             } while (trainingStatus.Status == TrainingStatusType.Running);
 
-            IsPersonGroupTrained = true;
+            IsPersonGroupTrained =
+                (trainingStatus.Status == TrainingStatusType.Succeeded) ? true : false;
         }
 
         public async Task<bool> MatchFaceAsync(Guid faceId)
         {
             if((faceId == Guid.Empty) || (searchedForPerson?.PersonId == null)) { return false; }
 
-            VerifyResult results =
-                await faceClient.Face.VerifyFaceToPersonAsync(
+            VerifyResult results;
+            try
+            {
+                results = await faceClient.Face.VerifyFaceToPersonAsync(
                     faceId, searchedForPerson.PersonId, personGroupId);
+
+            }
+            catch (APIErrorException ae)
+            {
+                Debug.WriteLine("MatchFaceAsync: " + ae.Message);
+                MessageBox.Show(ae.Message, "No faces associated with this person");
+                return false;
+            }
 
             // Can change using VerifyResult.Confidence.
             // Default: True if similarity confidence is greater than or equal to 0.5.
@@ -223,7 +269,9 @@ namespace FaceFinder
         public void DisplayFacesInGroup(string userData, ObservableCollection<ImageInfo> GroupInfos)
         {
             string[] filePaths =
-                userData?.Split(new char[] { USERDATA_DELIMITER }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+                userData?.Split(new char[] { FACE_DELIMITER }, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
+            if(filePaths == Array.Empty<string>()) { return; }
+
             foreach (string path in filePaths)
             {
                 ImageInfo groupInfo = new ImageInfo();
@@ -232,31 +280,33 @@ namespace FaceFinder
             }
         }
 
-        public async Task DeletePersonGroupAsync(string name)
+        public async Task DeletePersonGroupAsync(string name, bool askFirst = true)
         {
             if (string.IsNullOrWhiteSpace(name)) { return; }
 
             string personGroupId = ConfigurePersonName(name) + "-group-id";
 
+            MessageBoxResult result;
             try
             {
-                MessageBoxResult result =
+                result = askFirst ?
                     MessageBox.Show("Delete " + name + " and its training images?", "Delete " + name,
-                                    MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                                    MessageBoxButton.OKCancel, MessageBoxImage.Warning) :
+                    MessageBoxResult.OK;
 
-                if(result == MessageBoxResult.OK)
+                if (result == MessageBoxResult.OK)
                 {
                     await faceClient.PersonGroup.DeleteAsync(personGroupId);
                 }
             }
             catch (APIErrorException ae)
             {
-                Debug.WriteLine("DeletePersonGroupAsync: {0}", ae.Message);
+                Debug.WriteLine("DeletePersonGroupAsync: " + ae.Message);
                 MessageBox.Show(ae.Message, "DeletePersonGroupAsync");
             }
             catch (Exception e)
             {
-                Debug.WriteLine("DeletePersonGroupAsync: {0}", e.Message);
+                Debug.WriteLine("DeletePersonGroupAsync: " + e.Message);
                 MessageBox.Show(e.Message, "DeletePersonGroupAsync");
             }
         }

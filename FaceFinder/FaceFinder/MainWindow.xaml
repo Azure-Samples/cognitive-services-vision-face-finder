@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FaceFinder"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Face Finder" Icon="Assets/FaceFinder.ico" Width="1300" Height="900">
+        Title="Face Finder" Icon="Assets/FaceFinder.ico" Width="1310" Height="900">
     <Window.DataContext>
         <local:ImageProcessor/>
     </Window.DataContext>
@@ -55,11 +55,11 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -67,10 +67,8 @@
               HorizontalAlignment="Right" VerticalAlignment="Stretch"
               Background="Blue" Width="1"/-->
 
-        <TextBlock Name="spacer" Grid.Row="0" Grid.Column="0" Text="" Margin="0,4"/>
-
-        <Expander Name="settings" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" ExpandDirection="Left" Panel.ZIndex="2" Opacity=".96"
-                  Margin="0,0,12,0" Padding="10,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" IsExpanded="{Binding IsSettingsExpanded}">
+        <Expander Name="settings" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ExpandDirection="Left" Panel.ZIndex="2" Opacity=".96"
+                  Margin="0,10,12,0" Padding="10,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" IsExpanded="{Binding IsSettingsExpanded}">
             <Border CornerRadius="6" Padding="6"
                     BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
                 <StackPanel Orientation="Vertical" Margin="0,-10,0,0" Grid.ColumnSpan="2">
@@ -152,27 +150,36 @@
             </Border>
         </Expander>
 
-        <ListBox Name="groupList" Grid.Row="1" Grid.Column="0" Width="130" Margin="6,4,4,4"
-                    ItemsSource="{Binding GroupInfos}"
-                    ItemTemplate="{StaticResource GroupTemplate}"
-                    HorizontalAlignment="Center"/>
+        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="130" Margin="6,4,4,4"
+                 Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
+                 ItemsSource="{Binding GroupInfos}"
+                 ItemTemplate="{StaticResource GroupTemplate}"
+                 HorizontalAlignment="Center"/>
 
-        <Image Name="splashImage" Grid.Row="1" Grid.Column="1" Margin="4"
+        <Image Name="splashImage" Grid.Row="0" Grid.Column="1" Margin="4"
                Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
 
-        <ListBox Name="thumbList" Grid.Row="1" Grid.Column="1" SelectionMode="Extended" Margin="4,4,6,4"
+        <ListBox Name="thumbList" Grid.Row="0" Grid.Column="1" SelectionMode="Extended" Margin="8,4"
                  ItemsSource="{Binding ImageInfos}"
                  ItemTemplate="{StaticResource ImageInfoTemplate}"
                  ItemsPanel="{StaticResource ImagePanelTemplate}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
 
-        <TextBlock Name="groupName" Grid.Row="2" Grid.Column="0" Text="{Binding SearchedForPerson}"
+        <TextBlock Name="groupName" Grid.Row="1" Grid.Column="0" Text="{Binding SearchedForPerson}"
+                   Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
                    HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center"
                    FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
 
-        <Grid Name="bottomPanel" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" Width="Auto" Margin="0,2,0,4">
+        <Grid Name="bottomPanel" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Margin="0,2,0,4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition/>

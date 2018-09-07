@@ -140,13 +140,7 @@ namespace FaceFinder
         public string SearchedForPerson
         {
             get => searchedForPerson;
-            set
-            {
-                SetProperty(ref searchedForPerson, value);
-                //GetGroupNamesAsync();
-                CreateGroupCommand.Execute(searchedForPerson);
-            }
-            //set => SetProperty(ref searchedForPerson, value);
+            set => SetProperty(ref searchedForPerson, value);
         }
 
         private string selectedFolder = string.Empty;
@@ -245,7 +239,9 @@ namespace FaceFinder
             set
             {
                 SetProperty(ref isPersonComboBoxOpen, value);
-                if (value) { GetGroupNamesAsync(); }
+
+                // Populates personComboBox when dropdown opens.
+                if (value) { CreateGroupCommand.Execute(string.Empty); }
             }
         }
 
@@ -281,8 +277,13 @@ namespace FaceFinder
             {
                 return createGroupCommand ?? (createGroupCommand = new RelayCommand(
                     p => isCreateGroupButtonEnabled,
-                    async p => await faceProcessor.CreatePersonGroupAsync(searchedForPerson, GroupInfos)));
+                    async p => await CreateGroupAndUpdateNamesAsync()));
             }
+        }
+        private async Task CreateGroupAndUpdateNamesAsync()
+        {
+            await faceProcessor.GetOrCreatePersonGroupAsync(searchedForPerson, GroupInfos);
+            await GetGroupNamesAsync();
         }
 
         private bool isDeleteGroupButtonEnabled = true;
@@ -324,7 +325,7 @@ namespace FaceFinder
             get
             {
                 return findFacesCommand ?? (findFacesCommand = new RelayCommand(
-                    p => isFindFacesButtonEnabled, p => FindFaces()));
+                    p => isFindFacesButtonEnabled, async p => await FindFacesAsync()));
             }
         }
 
@@ -366,7 +367,7 @@ namespace FaceFinder
             faceProcessor = new FaceProcessor();
         }
 
-        private async void FindFaces()
+        private async Task FindFacesAsync()
         {
             if (ComputerVisionKey.Equals(string.Empty) || FaceKey.Equals(string.Empty))
             {
@@ -391,7 +392,7 @@ namespace FaceFinder
 
             isFindFacesButtonEnabled = true;
 
-            // HIGH: without this statement, app suspends updating UI until explicit focus change (mouse or key event)
+            // TODO: without this statement, app suspends updating UI until explicit focus change (mouse or key event)
             await Task.Delay(1);
         }
         private void CancelFindFaces()
@@ -505,14 +506,14 @@ namespace FaceFinder
                 // Catch and display Face errors.
                 catch (APIErrorException fe)
                 {
-                    Debug.WriteLine("ProcessImageFilesForFacesAsync: {0}", fe.Message);
-                    MessageBox.Show(fe.Message, "ProcessImageFilesForFacesAsync");
+                    Debug.WriteLine("ProcessImageFilesForFacesAsync, api: " + fe.Message);
+                    MessageBox.Show(fe.Message + ": " + file.Name, "ProcessImageFilesForFacesAsync");
                     break;
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("ProcessImageFilesForFacesAsync: {0}", e.Message);
-                    MessageBox.Show(e.Message, "ProcessImageFilesForFacesAsync");
+                    Debug.WriteLine("ProcessImageFilesForFacesAsync: " + e.Message);
+                    MessageBox.Show(e.Message + ": " + file.Name, "ProcessImageFilesForFacesAsync");
                     break;
                 }
             }
@@ -540,7 +541,7 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                Debug.WriteLine("ProcessImageFileForThumbAsync: {0}", cve.Message);
+                Debug.WriteLine("ProcessImageFileForThumbAsync: " + cve.Message);
                 //MessageBox.Show(cve.Message, "ProcessImageFileForThumbAsync");
                 return string.Empty;
             }
@@ -567,8 +568,7 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                Debug.WriteLine("ProcessImageFileForCaptionAsync: {0}", cve.Message);
-                //MessageBox.Show(cve.Message, "ProcessImageFileForCaptionAsync");
+                Debug.WriteLine("ProcessImageFileForCaptionAsync: " + cve.Message);
             }
             return caption;
         }
@@ -606,8 +606,7 @@ namespace FaceFinder
             }
             catch (ComputerVisionErrorException cve)
             {
-                Debug.WriteLine("ProcessImageFileForTextAsync: {0}", cve.Message);
-                //MessageBox.Show(cve.Message, "ProcessImageFileForTextAsync");
+                Debug.WriteLine("ProcessImageFileForTextAsync: " + cve.Message);
             }
             return ocrResult;
         }
@@ -628,17 +627,18 @@ namespace FaceFinder
                     BitmapMetadata bitmapMetadata = bitmapFrame.Metadata as BitmapMetadata;
                     if (bitmapMetadata?.DateTaken != null)
                     {
-                        dateTaken = bitmapMetadata.GetQuery(bitmapMetadata.DateTaken).ToString();
+                        dateTaken = bitmapMetadata?.DateTaken;
                     }
+                    // Throws NotSupportedException on png's (bitmap codec does not support the bitmap property)
                     if (bitmapMetadata?.Title != null)
                     {
-                        title = bitmapMetadata.GetQuery(bitmapMetadata.Title) as string;
+                        title = bitmapMetadata?.Title;
                     }
                 }
             }
-            catch (NotSupportedException e) // The bitmap codec does not support the bitmap property.
+            catch (NotSupportedException e)
             {
-                //MessageBox.Show(e.Message, "GetImageMetadata: " + file.Name);
+                Debug.WriteLine("GetImageMetadata: " + file.Name + "\t" + e.Message);
             }
 
             var metadata = dateTaken + " " + title;
@@ -648,18 +648,17 @@ namespace FaceFinder
             return metadata;
         }
 
-        private async void GetGroupNamesAsync()
+        // Called by IsPersonComboBoxOpen setter
+        private async Task GetGroupNamesAsync()
         {
-            GroupNames.Clear();
             IList<string> groupNames = await faceProcessor.GetAllPersonGroupNamesAsync();
             foreach (string name in groupNames)
             {
-                GroupNames.Add(name);
+                if(!GroupNames.Contains(name))
+                {
+                    GroupNames.Add(name);
+                }
             }
-            //if (GroupNames.Contains(searchedForPerson))
-            //{
-            //    personName.SelectedItem = searchedForPerson;
-            //}
         }
 
         private async Task AddToGroupAsync(object selectedThumbnails)
