@@ -63,9 +63,21 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--GridSplitter Grid.Row="1" Grid.Column="0" Panel.ZIndex="1"
-              HorizontalAlignment="Right" VerticalAlignment="Stretch"
-              Background="Blue" Width="1"/-->
+
+        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="130" Margin="6,4,4,4"
+                 Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
+                 ItemsSource="{Binding GroupInfos}"
+                 ItemTemplate="{StaticResource GroupTemplate}"
+                 HorizontalAlignment="Center"/>
+
+        <Image Name="splashImage" Grid.Row="0" Grid.Column="1" Margin="4"
+               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
+
+        <ListBox Name="thumbList" Grid.Row="0" Grid.Column="1" SelectionMode="Extended" Margin="8,4"
+                 ItemsSource="{Binding ImageInfos}"
+                 ItemTemplate="{StaticResource ImageInfoTemplate}"
+                 ItemsPanel="{StaticResource ImagePanelTemplate}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
 
         <Expander Name="settings" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" ExpandDirection="Left" Panel.ZIndex="2" Opacity=".96"
                   Margin="0,10,12,0" Padding="10,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top" IsExpanded="{Binding IsSettingsExpanded}">
@@ -149,21 +161,6 @@
                 </StackPanel>
             </Border>
         </Expander>
-
-        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="130" Margin="6,4,4,4"
-                 Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
-                 ItemsSource="{Binding GroupInfos}"
-                 ItemTemplate="{StaticResource GroupTemplate}"
-                 HorizontalAlignment="Center"/>
-
-        <Image Name="splashImage" Grid.Row="0" Grid.Column="1" Margin="4"
-               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
-
-        <ListBox Name="thumbList" Grid.Row="0" Grid.Column="1" SelectionMode="Extended" Margin="8,4"
-                 ItemsSource="{Binding ImageInfos}"
-                 ItemTemplate="{StaticResource ImageInfoTemplate}"
-                 ItemsPanel="{StaticResource ImagePanelTemplate}"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
 
         <TextBlock Name="groupName" Grid.Row="1" Grid.Column="0" Text="{Binding SearchedForPerson}"
                    Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
