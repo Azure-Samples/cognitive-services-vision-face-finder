@@ -238,10 +238,14 @@ namespace FaceFinder
             get => isPersonComboBoxOpen;
             set
             {
+                // value == true onOpen, false onClose
                 SetProperty(ref isPersonComboBoxOpen, value);
 
-                // Populates personComboBox when dropdown opens.
-                if (value) { CreateGroupCommand.Execute(string.Empty); }
+                // Populates personComboBox.
+                if ((value && GroupNames.Count == 0) || !value)
+                {
+                    CreateGroupCommand.Execute(string.Empty);
+                }
             }
         }
 
@@ -277,12 +281,12 @@ namespace FaceFinder
             {
                 return createGroupCommand ?? (createGroupCommand = new RelayCommand(
                     p => isCreateGroupButtonEnabled,
-                    async p => await CreateGroupAndUpdateNamesAsync()));
+                    async p => await CreateGroupAndUpdateNamesAsync(searchedForPerson)));
             }
         }
-        private async Task CreateGroupAndUpdateNamesAsync()
+        private async Task CreateGroupAndUpdateNamesAsync(string person)
         {
-            await faceProcessor.GetOrCreatePersonGroupAsync(searchedForPerson, GroupInfos);
+            await faceProcessor.GetOrCreatePersonGroupAsync(person, GroupInfos);
             await GetGroupNamesAsync();
         }
 

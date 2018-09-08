@@ -18,7 +18,7 @@
         <DataTemplate x:Key="GroupTemplate" DataType="ImageInfo">
             <StackPanel Orientation="Vertical"
                         HorizontalAlignment="Center" VerticalAlignment="Center" Width="120">
-                <Image x:Name="personThumbNail" Height="120" Margin="0,0,2,0" Stretch="UniformToFill">
+                <Image x:Name="personThumbNail" Height="120" Stretch="UniformToFill">
                     <Image.Source>
                         <BitmapImage CacheOption="OnLoad" UriSource="{Binding FilePath}" />
                     </Image.Source>
@@ -64,7 +64,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="130" Margin="6,4,4,4"
+        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="134" Margin="6,4,4,4"
                  Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
                  ItemsSource="{Binding GroupInfos}"
                  ItemTemplate="{StaticResource GroupTemplate}"

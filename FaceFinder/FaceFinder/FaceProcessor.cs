@@ -77,39 +77,10 @@ namespace FaceFinder
             return personGroupNames;
         }
 
-        public async Task<bool> VerifyPersonGroupAsync(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name)) { return false; }
-
-            string groupName = ConfigurePersonName(name) + "-group";
-
-            IList<string> personGroupNames = new List<string>();
-            try
-            {
-                IList<PersonGroup> personGroups = await faceClient.PersonGroup.ListAsync();
-                foreach (PersonGroup group in personGroups)
-                {
-                    if (group.Name.Equals(groupName))
-                    {
-                        personGroupId = group.PersonGroupId;
-                        personGroupName = groupName;
-                        searchedForPerson =
-                            (await faceClient.PersonGroupPerson.ListAsync(personGroupId))[0];
-                        return true;
-                    }
-                }
-            }
-            catch (APIErrorException e)
-            {
-                Debug.WriteLine("VerifyPersonGroupAsync: " + e.Message);
-                MessageBox.Show(e.Message, "VerifyPersonGroupAsync");
-            }
-            return false;
-        }
-
         public async Task GetOrCreatePersonGroupAsync(string name,
             ObservableCollection<ImageInfo> GroupInfos)
         {
+            Debug.WriteLine("GetOrCreatePersonGroupAsync: " + name);
             if (string.IsNullOrWhiteSpace(name)) { return; }
 
             searchedForPerson = defaultEmptyPerson;
@@ -150,6 +121,7 @@ namespace FaceFinder
             {
                 if(ae.Response.StatusCode != System.Net.HttpStatusCode.NotFound)
                 {
+                    searchedForPerson = defaultEmptyPerson;
                     personGroupId = string.Empty;
                     Debug.WriteLine("GetOrCreatePersonGroupAsync: " + ae.Message);
                     MessageBox.Show(ae.Message, "GetOrCreatePersonGroupAsync");
@@ -180,6 +152,7 @@ namespace FaceFinder
             }
             catch (APIErrorException ae)
             {
+                searchedForPerson = defaultEmptyPerson;
                 await faceClient.PersonGroup.DeleteAsync(personGroupId);
                 personGroupId = string.Empty;
                 Debug.WriteLine("GetOrCreatePersonGroupAsync: " + ae.Message);
@@ -192,41 +165,40 @@ namespace FaceFinder
         public async Task AddFacesToPersonGroupAsync(string personName,
             IList<ImageInfo> selectedItems, ObservableCollection<ImageInfo> GroupInfos)
         {
-            if(!await VerifyPersonGroupAsync(personName)) { return; }
+            if (searchedForPerson == defaultEmptyPerson)
+            {
+                Debug.WriteLine("AddFacesToPersonGroupAsync, no searchedForPerson, personName = " + personName);
+                return;
+            }
 
             string userData = searchedForPerson.UserData;
-            Debug.WriteLine("Before adding, PersistedFaceIds.Count: " + searchedForPerson.PersistedFaceIds.Count);
-
-            int newFaces = 0;
 
             foreach (ImageInfo info in selectedItems)
             {
                 string imagePath = info.FilePath;
 
-                // HIGH: userData always null -> adds duplicates
-                
+                // TODO: userData always null -> adds duplicate images
                 if (userData?.Contains(imagePath) ?? false) { continue; } // Face already added to Person
 
                 using (FileStream stream = new FileStream(info.FilePath, FileMode.Open))
                 {
                     PersistedFace persistedFace =
                         await faceClient.PersonGroupPerson.AddFaceFromStreamAsync(
-                            personGroupId, searchedForPerson.PersonId, stream,
-                            imagePath + FACE_DELIMITER.ToString());
+                            personGroupId, searchedForPerson.PersonId, stream, "img123");
+                    //imagePath + FACE_DELIMITER.ToString());
                 }
 
-                newFaces++;
                 GroupInfos.Add(info);
             }
-            Debug.WriteLine("After adding, PersistedFaceIds.Count: " + searchedForPerson.PersistedFaceIds.Count);
 
-            // TODO: PersistedFaceIds.Count doesn't show results of current additions
-            //if(searchedForPerson.PersistedFaceIds.Count == 0)
-            if (newFaces == 0)
+            searchedForPerson = (await faceClient.PersonGroupPerson.ListAsync(personGroupId))[0];
+
+            string str = searchedForPerson.UserData ?? "null";
+            Debug.WriteLine("searchedForPerson.UserData: " + str);
+
+            if(searchedForPerson.PersistedFaceIds.Count == 0)
             {
-                // TODO: shouldn't get here until userData works (trying to add same image)
-                IsPersonGroupTrained = (searchedForPerson.PersistedFaceIds.Count > 0);
-                return;
+                IsPersonGroupTrained = false; return;
             }
 
             await faceClient.PersonGroup.TrainAsync(personGroupId);
