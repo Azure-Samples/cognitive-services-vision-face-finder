@@ -311,14 +311,14 @@ namespace FaceFinder
         }
 
         private bool isAddToGroupButtonEnabled = true;
-        private ICommand addToGroupCommand;
-        public ICommand AddToGroupCommand
+        private ICommand addToPersonCommand;
+        public ICommand AddToPersonCommand
         {
             get
             {
-                return addToGroupCommand ?? (addToGroupCommand = new RelayCommand(
+                return addToPersonCommand ?? (addToPersonCommand = new RelayCommand(
                     p => isAddToGroupButtonEnabled,
-                    async p => await AddToGroupAsync(p)));
+                    async p => await AddToPersonAsync(p)));
             }
         }
 
@@ -470,6 +470,7 @@ namespace FaceFinder
 
                         FaceImageCount++;
 
+                        // If match on face, call faceProcessor
                         if (MatchFace && faceProcessor.IsPersonGroupTrained)
                         {
                             bool isFaceMatch = await faceProcessor.MatchFaceAsync(detectedFaceId);
@@ -665,7 +666,7 @@ namespace FaceFinder
             }
         }
 
-        private async Task AddToGroupAsync(object selectedThumbnails)
+        private async Task AddToPersonAsync(object selectedThumbnails)
         {
             if (string.IsNullOrWhiteSpace(SearchedForPerson)) { return; }
 
@@ -673,7 +674,7 @@ namespace FaceFinder
             if(selectedItems.Count == 0) { return; }
 
             IList<ImageInfo> items = selectedItems.Cast<ImageInfo>().ToList();
-            await faceProcessor.AddFacesToPersonGroupAsync(SearchedForPerson, items, GroupInfos);
+            await faceProcessor.AddFacesToPersonAsync(SearchedForPerson, items, GroupInfos);
         }
 
         public void GetDataFromIsolatedStorage()

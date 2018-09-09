@@ -152,8 +152,8 @@
                         Select one or more images of this person, using the Ctrl and Shift keys for multiple selections.
                         Each selected image should contain only one face. When selection is complete, click
                     </TextBlock>
-                    <Button x:Name="addToGroupButton" Content="Add Faces" Margin="0,8,0,0"
-                            Command="{Binding AddToGroupCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
+                    <Button x:Name="addToPersonButton" Content="Add Faces" Margin="0,8,0,0"
+                            Command="{Binding AddToPersonCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
                             HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
 
                     <TextBlock Text="Now rerun 'Find Faces' to see images matching just this person."
