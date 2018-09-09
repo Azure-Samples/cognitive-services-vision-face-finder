@@ -45,6 +45,7 @@
                            Visibility="{Binding ElementName=getMetadata, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBlock Text="{Binding OcrResult}"
                            Visibility="{Binding ElementName=getOCR, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding Confidence}"/>
                 <!--TextBlock Text="{Binding Caption}"/-->
             </StackPanel>
         </DataTemplate>

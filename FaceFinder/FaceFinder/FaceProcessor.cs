@@ -234,7 +234,7 @@ namespace FaceFinder
             return faceUserData;
         }
 
-        public async Task<bool> MatchFaceAsync(Guid faceId)
+        public async Task<bool> MatchFaceAsync(Guid faceId, ImageInfo newImage)
         {
             if((faceId == Guid.Empty) || (searchedForPerson?.PersonId == null)) { return false; }
 
@@ -243,6 +243,7 @@ namespace FaceFinder
             {
                 results = await faceClient.Face.VerifyFaceToPersonAsync(
                     faceId, searchedForPerson.PersonId, personGroupId);
+                newImage.Confidence = results.Confidence.ToString("P");
 
             }
             catch (APIErrorException ae)

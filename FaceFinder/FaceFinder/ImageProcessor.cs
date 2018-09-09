@@ -405,6 +405,7 @@ namespace FaceFinder
             cancellationTokenSource.Cancel();
         }
 
+        // The root of image processing. Calls all the other image processing methods.
         public async Task ProcessImageFilesForFacesAsync(
             FileInfo[] imageFiles, CancellationToken cancellationToken)
         {
@@ -473,7 +474,7 @@ namespace FaceFinder
                         // If match on face, call faceProcessor
                         if (MatchFace && faceProcessor.IsPersonGroupTrained)
                         {
-                            bool isFaceMatch = await faceProcessor.MatchFaceAsync(detectedFaceId);
+                            bool isFaceMatch = await faceProcessor.MatchFaceAsync(detectedFaceId, newImage);
                             if (!isFaceMatch) { continue; }
                         }
 

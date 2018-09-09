@@ -9,5 +9,6 @@
         public string Caption { get; set; } = string.Empty;
         public string OcrResult { get; set; } = string.Empty;
         public string ThumbUrl { get; set; } = string.Empty;
+        public string Confidence { get; set; } = string.Empty;
     }
 }
