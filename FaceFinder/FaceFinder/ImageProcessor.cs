@@ -485,6 +485,10 @@ namespace FaceFinder
                             Task thumbTask = ProcessImageFileForThumbAsync(file, newImage, thumbnailsFolder);
                             tasks.Add(thumbTask);
                         }
+                        else
+                        {
+                            newImage.ThumbUrl = file.FullName;
+                        }
                         if (getCaption)
                         {
                             Task captionTask = ProcessImageFileForCaptionAsync(file, newImage);

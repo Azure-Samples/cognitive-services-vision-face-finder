@@ -102,7 +102,7 @@
 
                     <CheckBox x:Name="displayFileName" Content="Display file name" IsChecked="{Binding DisplayFileName}" Margin="0,16,0,0"/>
                     <CheckBox x:Name="displayAttributes" Content="Display age and gender" IsChecked="{Binding DisplayAttributes}" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" IsEnabled="False" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getMetadata" Content="Get title and date taken" IsChecked="{Binding GetMetadata}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getOCR" Content="Get OCR" IsChecked="{Binding GetOCR}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getCaption" Content="Get caption (tool tip)" IsChecked="{Binding GetCaption}" Margin="0,10,0,0"/>
