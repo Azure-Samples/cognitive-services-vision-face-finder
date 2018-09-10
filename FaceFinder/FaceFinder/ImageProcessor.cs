@@ -303,7 +303,7 @@ namespace FaceFinder
         }
         private async Task DeleteAsync()
         {
-            await faceProcessor.DeletePersonGroupAsync(searchedForPerson);
+            await faceProcessor.DeletePersonGroupAsync(searchedForPerson, GroupInfos);
             if (GroupNames.Contains(searchedForPerson))
             {
                 GroupNames.Remove(searchedForPerson);
@@ -343,9 +343,9 @@ namespace FaceFinder
                         p => isCancelButtonEnabled, p => CancelFindFaces()));
             }
         }
-    #endregion Commands
+        #endregion Commands
 
-        public FaceProcessor faceProcessor;
+        public FaceProcessor faceProcessor { get; set; }
         public ObservableCollection<ImageInfo> ImageInfos { get; set; }
         public ObservableCollection<ImageInfo> GroupInfos { get; set; }
         public ObservableCollection<string> GroupNames { get; set; }
@@ -660,7 +660,7 @@ namespace FaceFinder
             IList<string> groupNames = await faceProcessor.GetAllPersonGroupNamesAsync();
             foreach (string name in groupNames)
             {
-                if(!GroupNames.Contains(name))
+                if (!GroupNames.Contains(name))
                 {
                     GroupNames.Add(name);
                 }

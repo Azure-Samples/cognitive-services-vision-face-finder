@@ -45,7 +45,8 @@
                            Visibility="{Binding ElementName=getMetadata, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBlock Text="{Binding OcrResult}"
                            Visibility="{Binding ElementName=getOCR, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <TextBlock Text="{Binding Confidence}"/>
+                <TextBlock Text="{Binding Confidence}"
+                           Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <!--TextBlock Text="{Binding Caption}"/-->
             </StackPanel>
         </DataTemplate>
@@ -66,7 +67,7 @@
         </Grid.RowDefinitions>
 
         <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="134" Margin="6,4,4,4"
-                 Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
+                 Visibility="{Binding ElementName=showFaces, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
                  ItemsSource="{Binding GroupInfos}"
                  ItemTemplate="{StaticResource GroupTemplate}"
                  HorizontalAlignment="Center"/>
@@ -132,8 +133,9 @@
                     </StackPanel>
 
                     <Separator Margin="0,16"/>
-                    
+
                     <CheckBox x:Name="matchFace" Content="Match person" IsChecked="{Binding MatchFace}"
+                              IsEnabled="{Binding faceProcessor.IsPersonGroupTrained}"
                               Margin="0,0,0,0" Width="Auto" HorizontalAlignment="Left"/>
 
                     <TextBlock Margin="0,4,0,0" Text="Select person to match" TextAlignment="Center"/>
@@ -153,9 +155,14 @@
                         Select one or more images of this person, using the Ctrl and Shift keys for multiple selections.
                         Each selected image should contain only one face. When selection is complete, click
                     </TextBlock>
-                    <Button x:Name="addToPersonButton" Content="Add Faces" Margin="0,8,0,0"
-                            Command="{Binding AddToPersonCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
-                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
+                        <Button x:Name="addToPersonButton" Content="Add Faces"
+                                Command="{Binding AddToPersonCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                        <CheckBox x:Name="showFaces" Content="Show"
+                              Margin="24,0,0,0" Width="Auto" VerticalAlignment="Center"/>
+                    </StackPanel>
 
                     <TextBlock Text="Now rerun 'Find Faces' to see images matching just this person."
                                Width="260" Margin="0,6,0,0" TextAlignment="Justify" TextWrapping="Wrap"/>
@@ -164,7 +171,7 @@
         </Expander>
 
         <TextBlock Name="groupName" Grid.Row="1" Grid.Column="0" Text="{Binding SearchedForPerson}"
-                   Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
+                   Visibility="{Binding ElementName=showFaces, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
                    HorizontalAlignment="Center" VerticalAlignment="Top" TextAlignment="Center"
                    FontSize="13" FontWeight="Bold" Margin="4,0,0,4" Foreground="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
 
