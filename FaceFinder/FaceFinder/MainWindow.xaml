@@ -46,7 +46,7 @@
                 <TextBlock Text="{Binding OcrResult}"
                            Visibility="{Binding ElementName=getOCR, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <TextBlock Text="{Binding Confidence}"
-                           Visibility="{Binding ElementName=matchFace, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                           Visibility="{Binding ElementName=matchPerson, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <!--TextBlock Text="{Binding Caption}"/-->
             </StackPanel>
         </DataTemplate>
@@ -88,12 +88,12 @@
                     BorderBrush="Gray" Background="AliceBlue" BorderThickness="2">
                 <StackPanel Orientation="Vertical" Margin="0,-10,0,0" Grid.ColumnSpan="2">
                     <TextBlock Text="Computer Vision subscription key" Margin="0,10,0,0"/>
-                    <TextBox Text="{Binding ComputerVisionKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding ComputerVisionKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left" MaxLength="32"/>
                     <TextBlock Text="Computer Vision endpoint" Margin="0,4,0,0"/>
                     <TextBox Text="{Binding ComputerVisionEndpoint, Mode=TwoWay}" MinWidth="260"/>
 
                     <TextBlock Text="Face subscription key" Margin="0,10,0,0"/>
-                    <TextBox Text="{Binding FaceKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding FaceKey, Mode=TwoWay}" MinWidth="200" HorizontalAlignment="Left" MaxLength="32"/>
                     <TextBlock Text="Face endpoint" Margin="0,4,0,0"/>
                     <TextBox Text="{Binding FaceEndpoint, Mode=TwoWay}" MinWidth="260"/>
 
@@ -118,7 +118,8 @@
                     </StackPanel>
 
                     <CheckBox x:Name="searchAge" Margin="0,10,0,8" Content="Search on age range"
-                              IsChecked="{Binding ElementName=displayAttributes, Path=IsChecked}"/>
+                              IsChecked="{Binding SearchAge, Mode=TwoWay}" 
+                              IsEnabled="{Binding ElementName=displayAttributes, Path=IsChecked, Mode=OneWay}"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock Width="14">
                             <TextBlock.Text>
@@ -138,8 +139,8 @@
 
                     <Separator Margin="0,16"/>
 
-                    <CheckBox x:Name="matchFace" Content="Match person" IsChecked="{Binding MatchFace}"
-                              IsEnabled="{Binding faceProcessor.IsPersonGroupTrained}"
+                    <CheckBox x:Name="matchPerson" Content="Match person" IsChecked="{Binding MatchPerson}"
+                              IsEnabled="{Binding faceProcessor.IsPersonGroupTrained, Mode=TwoWay}"
                               ToolTip="enabled when selected person has at least one added face"
                               Margin="0,0,0,0" Width="Auto" HorizontalAlignment="Left"/>
 

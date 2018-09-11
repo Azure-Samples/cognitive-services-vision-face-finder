@@ -31,7 +31,7 @@ namespace FaceFinder
         private const string isolatedStorageFile = "FaceFinderStorage.txt";
         private const string thumbnailsFolderName = "FaceThumbnails";
 
-        // Defaults associated with free tier, F0.
+        // Defaults associated with free tier, S0.
         private const string _computerVisionEndpoint =
             "https://westcentralus.api.cognitive.microsoft.com";
         private const string _faceEndpoint =
@@ -50,7 +50,7 @@ namespace FaceFinder
         private CancellationTokenSource cancellationTokenSource;
         private FileInfo[] imageFiles = Array.Empty<FileInfo>();
 
-        #region Bound properties
+    #region Bound properties
         private int splashZIndex = 1;
         public int SplashZIndex
         {
@@ -196,7 +196,11 @@ namespace FaceFinder
         public bool DisplayAttributes
         {
             get => displayAttributes;
-            set => SetProperty(ref displayAttributes, value);
+            set
+            {
+                SetProperty(ref displayAttributes, value);
+                if (!value) { SearchAge = value; }
+            }
         }
         private bool getThumbnail = true;
         public bool GetThumbnail
@@ -242,11 +246,11 @@ namespace FaceFinder
             set => SetProperty(ref searchAge, value);
         }
 
-        private bool matchFace;
-        public bool MatchFace
+        private bool matchPerson;
+        public bool MatchPerson
         {
-            get => matchFace;
-            set => SetProperty(ref matchFace, value);
+            get => matchPerson;
+            set => SetProperty(ref matchPerson, value);
         }
 
         private bool isPersonComboBoxOpen;
@@ -489,7 +493,7 @@ namespace FaceFinder
                         FaceImageCount++;
 
                         // If match on face, call faceProcessor
-                        if (MatchFace && faceProcessor.IsPersonGroupTrained)
+                        if (MatchPerson && faceProcessor.IsPersonGroupTrained)
                         {
                             bool isFaceMatch = await faceProcessor.MatchFaceAsync(detectedFaceId, newImage);
                             if (!isFaceMatch) { continue; }
@@ -525,7 +529,7 @@ namespace FaceFinder
 
                         ImageInfos.Add(newImage);
 
-                        if (MatchFace)
+                        if (MatchPerson)
                         {
                             FaceCount = ImageInfos.Count;
                         }

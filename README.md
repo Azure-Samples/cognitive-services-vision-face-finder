@@ -44,22 +44,9 @@ This sample searches a folder for image files containing a face. Selected attrib
 1. Click **Select folder** and browse to a folder that you want to search for images containing faces.
 1. Click **Find faces**, which searches the folder for image files and then analyzes these files for faces. Images found with faces are displayed along with information about the faces. By default, the file name, gender, and age are displayed.
 
-## Known issues
-
-* Performance is related to image size due to uploading and processing time. Small images on the order of 20 KB can provide good results.
-* Image metadata is not available.
-* Images associated with a person aren't displayed (but still used for matching) after selecting a different person and then returning to the previous person.
-* Future features:
-  * Persistence of settings other than subscription keys and endpoints
-  * Search subfolders
-  * Confidence slider for what constitutes a matched face
-  * Number picker to limit number of images processed
-  * Image reduction/compression before upload
-  * Azure blob storage
-
 ## Resources
 
-* [Included Help guide](HELP.md)
+* Included [Help guide](HELP.md) and [Program notes](PROGRAM-NOTES.md).
 * [Computer Vision service documentation](https://docs.microsoft.com/azure/cognitive-services/computer-vision/)
 * [Computer Vision API - v2.0](https://westus.dev.cognitive.microsoft.com/docs/services/5adf991815e1060e6355ad44/operations/56f91f2e778daf14a499e1fa)
 * [Microsoft.Azure.CognitiveServices.Vision.ComputerVision 3.2.0](https://www.nuget.org/packages/Microsoft.Azure.CognitiveServices.Vision.ComputerVision/3.2.0) client library NuGet package
