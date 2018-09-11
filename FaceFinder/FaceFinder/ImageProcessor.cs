@@ -50,12 +50,18 @@ namespace FaceFinder
         private CancellationTokenSource cancellationTokenSource;
         private FileInfo[] imageFiles = Array.Empty<FileInfo>();
 
-    #region Bound properties
+        #region Bound properties
         private int splashZIndex = 1;
         public int SplashZIndex
         {
             get => splashZIndex;
             set => SetProperty(ref splashZIndex, value);
+        }
+        private bool splashVisibilty = true;
+        public bool SplashVisibilty
+        {
+            get => splashVisibilty;
+            set => SetProperty(ref splashVisibilty, value);
         }
 
         private string computerVisionKey = string.Empty;
@@ -136,11 +142,22 @@ namespace FaceFinder
             set => SetProperty(ref faceCount, value);
         }
 
+        private bool isSearchedForPersonNotEmpty;
+        public bool IsSearchedForPersonNotEmpty
+        {
+            get => isSearchedForPersonNotEmpty;
+            set => SetProperty(ref isSearchedForPersonNotEmpty, value);
+        }
+
         private string searchedForPerson;
         public string SearchedForPerson
         {
             get => searchedForPerson;
-            set => SetProperty(ref searchedForPerson, value);
+            set
+            {
+                SetProperty(ref searchedForPerson, value);
+                IsSearchedForPersonNotEmpty = !string.IsNullOrWhiteSpace(searchedForPerson); 
+            }
         }
 
         private string selectedFolder = string.Empty;
@@ -487,6 +504,7 @@ namespace FaceFinder
                         }
                         else
                         {
+                            // Use local image
                             newImage.ThumbUrl = file.FullName;
                         }
                         if (getCaption)
@@ -744,7 +762,10 @@ namespace FaceFinder
                 return;
             }
 
+            // Hide splash image.
             SplashZIndex = 0;
+            SplashVisibilty = false;
+
             isFindFacesButtonEnabled = true;
         }
 

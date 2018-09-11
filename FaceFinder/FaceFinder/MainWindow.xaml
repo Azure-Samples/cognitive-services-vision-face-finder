@@ -73,7 +73,8 @@
                  HorizontalAlignment="Center"/>
 
         <Image Name="splashImage" Grid.Row="0" Grid.Column="1" Margin="4"
-               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"/>
+               Source="Assets/FaceFinder.jpg" Panel.ZIndex="{Binding SplashZIndex}"
+               Visibility="{Binding SplashVisibilty, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
         <ListBox Name="thumbList" Grid.Row="0" Grid.Column="1" SelectionMode="Extended" Margin="8,4"
                  ItemsSource="{Binding ImageInfos}"
@@ -102,8 +103,10 @@
 
                     <CheckBox x:Name="displayFileName" Content="Display file name" IsChecked="{Binding DisplayFileName}" Margin="0,16,0,0"/>
                     <CheckBox x:Name="displayAttributes" Content="Display age and gender" IsChecked="{Binding DisplayAttributes}" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" Margin="0,10,0,0"/>
-                    <CheckBox x:Name="getMetadata" Content="Get title and date taken" IsChecked="{Binding GetMetadata}" Margin="0,10,0,0"/>
+                    <CheckBox x:Name="getThumbnail" Content="Get thumbnail" IsChecked="{Binding GetThumbnail}" Margin="0,10,0,0"
+                              ToolTip="saves in new 'FaceThumbnails' subfolder of selected folder"/>
+                    <CheckBox x:Name="getMetadata" Content="Get title and date taken" IsChecked="{Binding GetMetadata}" Margin="0,10,0,0"
+                              ToolTip="if available, png's supply date taken, jpg's supply date taken and title"/>
                     <CheckBox x:Name="getOCR" Content="Get OCR" IsChecked="{Binding GetOCR}" Margin="0,10,0,0"/>
                     <CheckBox x:Name="getCaption" Content="Get caption (tool tip)" IsChecked="{Binding GetCaption}" Margin="0,10,0,0"/>
 
@@ -136,6 +139,7 @@
 
                     <CheckBox x:Name="matchFace" Content="Match person" IsChecked="{Binding MatchFace}"
                               IsEnabled="{Binding faceProcessor.IsPersonGroupTrained}"
+                              ToolTip="enabled when selected person has at least one added face"
                               Margin="0,0,0,0" Width="Auto" HorizontalAlignment="Left"/>
 
                     <TextBlock Margin="0,4,0,0" Text="Select person to match" TextAlignment="Center"/>
@@ -145,27 +149,31 @@
                               SelectedItem="{Binding SearchedForPerson}" IsDropDownOpen="{Binding IsPersonComboBoxOpen}"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
-                        <Button x:Name="createGroupButton" Content="Add Person" Command="{Binding CreateGroupCommand}" Margin="0,0,0,0"
-                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
-                        <Button x:Name="deleteGroupButton" Content="Delete" Command="{Binding DeleteGroupCommand}" Margin="32,0,0,0"
-                            HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                        <Button x:Name="createGroupButton" Content="Add Person" Command="{Binding CreateGroupCommand}"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
+                        <Button x:Name="deleteGroupButton" Content="Delete Person" Command="{Binding DeleteGroupCommand}" Margin="16,0,0,0"
+                                IsEnabled="{Binding IsSearchedForPersonNotEmpty}"
+                                ToolTip="opens confirmation dialog"
+                                HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
                     </StackPanel>
 
                     <TextBlock Width="260" Margin="0,8,0,0" TextAlignment="Justify" TextWrapping="Wrap">
                         Select one or more images of this person, using the Ctrl and Shift keys for multiple selections.
-                        Each selected image should contain only one face. When selection is complete, click
+                        Each selected image should contain only one face. When selection is complete, click 'Add Faces'.
                     </TextBlock>
                     
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
                         <Button x:Name="addToPersonButton" Content="Add Faces"
                                 Command="{Binding AddToPersonCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
+                                IsEnabled="{Binding IsSearchedForPersonNotEmpty}"
                                 HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
-                        <CheckBox x:Name="showFaces" Content="Show"
-                              Margin="24,0,0,0" Width="Auto" VerticalAlignment="Center"/>
+                        <CheckBox x:Name="showFaces" Content="Display"
+                              Margin="36,0,0,0" Width="Auto" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="Now rerun 'Find Faces' to see images matching just this person."
-                               Width="260" Margin="0,6,0,0" TextAlignment="Justify" TextWrapping="Wrap"/>
+                    <TextBlock Width="260" Margin="0,6,0,0" TextAlignment="Justify" TextWrapping="Wrap">
+                        Now select 'Match person' and rerun 'Find Faces' to see images matching just this person.
+                    </TextBlock>
                 </StackPanel>
             </Border>
         </Expander>
