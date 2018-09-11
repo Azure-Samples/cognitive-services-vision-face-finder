@@ -6,7 +6,7 @@ author: easyj2j
 
 # Face Finder
 
-This sample searches a folder for image files containing a face. Selected attributes of the image and face are displayed. Searches can be filtered by age range, gender, and whether the face matches a specified person. The sample uses the Windows client libraries for the Computer Vision and Face services of Microsoft Cognitive Services.
+This sample searches a folder for image files containing a face. Selected attributes of the image and face are displayed. Searches can be filtered by age range, gender, and whether the face matches a specified person. The sample uses the [Windows client libraries](https://www.nuget.org/packages?q=Microsoft.Azure.CognitiveServices.Vision) for the [Computer Vision](https://docs.microsoft.com/azure/cognitive-services/computer-vision/) and [Face](https://docs.microsoft.com/azure/cognitive-services/face/) services of [Microsoft Cognitive Services](https://docs.microsoft.com/azure/cognitive-services/).
 
 ## Features
 

@@ -13,11 +13,11 @@ To start:
 
 Note: If **Get thumbnail** is selected, a subfolder named *FaceThumbnails* is created in the selected folder to store the thumbnails created by the Computer Vision service.
 
-The following screenshot shows the opening screen with the setting pane opened.
+The following screenshot shows the opening screen with the settings pane opened.
 
 ![Opening screenshot](Images/facefinder-opening-screen.png)
 
-The following screenshot shows a search for males between the ages of 50 and 70.
+The following screenshot shows a search for males between the ages of 50 and 70. Note the tool tip on the 3rd image showing the caption from Computer Vision's analysis of the image.
 
 ![Screenshot after filtered search](Images/facefinder-after-search.png)
 
@@ -36,7 +36,7 @@ The following screenshot shows the results after searching for images that match
 
 ![Screenshot after filtered search](Images/facefinder-person-match.png)
 
-A person and their associated images are persisted. To delete a person:
+A person and their associated images are persisted. To delete a person and their images:
 
 1. Select the person in the combo box.
 1. Click **Delete**. A confirmation dialog appears for approval.
