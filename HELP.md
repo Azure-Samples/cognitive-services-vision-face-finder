@@ -17,7 +17,7 @@ The following screenshot shows the opening screen with the settings pane opened.
 
 ![Opening screenshot](Images/facefinder-opening-screen.png)
 
-The following screenshot shows a search for males between the ages of 50 and 70. Note the tool tip on the 3rd image showing the caption from Computer Vision's analysis of the image.
+The following screenshot shows a search for males between the ages of 50 and 70. Note the tool tip on the third image showing the caption from Computer Vision's analysis of the image.
 
 ![Screenshot after filtered search](Images/facefinder-after-search.png)
 

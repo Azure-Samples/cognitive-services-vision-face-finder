@@ -46,7 +46,6 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 ## Resources
 
-* Included [Help guide](HELP.md) and [Program notes](PROGRAM-NOTES.md).
 * [Computer Vision service documentation](https://docs.microsoft.com/azure/cognitive-services/computer-vision/)
 * [Computer Vision API - v2.0](https://westus.dev.cognitive.microsoft.com/docs/services/5adf991815e1060e6355ad44/operations/56f91f2e778daf14a499e1fa)
 * [Microsoft.Azure.CognitiveServices.Vision.ComputerVision 3.2.0](https://www.nuget.org/packages/Microsoft.Azure.CognitiveServices.Vision.ComputerVision/3.2.0) client library NuGet package
