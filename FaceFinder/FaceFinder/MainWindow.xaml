@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Face Finder" Icon="Assets/FaceFinder.ico" Width="1310" Height="900">
     <Window.DataContext>
-        <local:ImageProcessor/>
+        <local:FaceFinderVM/>
     </Window.DataContext>
 
     <Window.Resources>

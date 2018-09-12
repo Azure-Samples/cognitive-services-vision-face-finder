@@ -23,7 +23,7 @@ namespace FaceFinder
     /// Processes image files to detect faces, attributes, and other info.
     /// Dependencies: Computer Vision & Face services.
     /// </summary>
-    class ImageProcessor : ViewModelBase
+    class FaceFinderVM : ViewModelBase
     {
         // LOW: bind to ui & choose
         private const SearchOption searchOption = SearchOption.TopDirectoryOnly;
@@ -371,7 +371,7 @@ namespace FaceFinder
         public ObservableCollection<ImageInfo> GroupInfos { get; set; }
         public ObservableCollection<string> GroupNames { get; set; }
 
-        public ImageProcessor()
+        public FaceFinderVM()
         {
             GetDataFromIsolatedStorage();
             ImageInfos = new ObservableCollection<ImageInfo>();
