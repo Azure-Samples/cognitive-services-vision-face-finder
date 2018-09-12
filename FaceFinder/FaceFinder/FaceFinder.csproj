@@ -79,6 +79,7 @@
     </ApplicationDefinition>
     <Compile Include="FaceProcessor.cs" />
     <Compile Include="ImageInfo.cs" />
+    <Compile Include="ImageProcessor.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">

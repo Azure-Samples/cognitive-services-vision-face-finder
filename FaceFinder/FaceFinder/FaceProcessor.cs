@@ -40,10 +40,26 @@ namespace FaceFinder
             set => SetProperty(ref personGroupName, value);
         }
 
-        public FaceProcessor()
+        public FaceProcessor(IFaceClient faceClient)
         {
-            faceClient = ((App)Application.Current).faceClient;
+            this.faceClient = faceClient;
             searchedForPerson = emptyPerson;
+        }
+
+        public async Task<IList<DetectedFace>> GetFaceListAsync(FileStream stream)
+        {
+            try
+            {
+                return await faceClient.Face.DetectWithStreamAsync(stream, true, false,
+                    new FaceAttributeType[]
+                        { FaceAttributeType.Age, FaceAttributeType.Gender });
+            }
+            catch (APIErrorException e)
+            {
+                Debug.WriteLine("GetFaceListAsync: " + e.Message);
+                MessageBox.Show(e.Message, "GetFaceListAsync");
+            }
+            return Array.Empty<DetectedFace>();
         }
 
         public async Task<IList<PersonGroup>> GetAllPersonGroupsAsync()

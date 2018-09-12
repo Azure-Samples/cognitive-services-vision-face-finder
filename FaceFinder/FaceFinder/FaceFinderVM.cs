@@ -12,9 +12,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
-using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
-using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
-using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 
 namespace FaceFinder
@@ -25,7 +22,7 @@ namespace FaceFinder
     /// </summary>
     class FaceFinderVM : ViewModelBase
     {
-        // LOW: bind to ui & choose
+        // TODO: bind to ui & choose
         private const SearchOption searchOption = SearchOption.TopDirectoryOnly;
 
         private const string isolatedStorageFile = "FaceFinderStorage.txt";
@@ -37,15 +34,8 @@ namespace FaceFinder
         private const string _faceEndpoint =
             "https://westcentralus.api.cognitive.microsoft.com";
 
-        private const int thumbWidth = 100, thumbHeight = 100;
-
-        private readonly string male =
-            Microsoft.Azure.CognitiveServices.Vision.Face.Models.Gender.Male.ToString();
-        private readonly string female =
-            Microsoft.Azure.CognitiveServices.Vision.Face.Models.Gender.Female.ToString();
-
-        private IComputerVisionClient computerVisionClient;
-        private IFaceClient faceClient;
+        private readonly string male = Gender.Male.ToString();
+        private readonly string female = Gender.Female.ToString();
 
         private CancellationTokenSource cancellationTokenSource;
         private FileInfo[] imageFiles = Array.Empty<FileInfo>();
@@ -366,6 +356,7 @@ namespace FaceFinder
         }
         #endregion Commands
 
+        public ImageProcessor imageProcessor { get; set; }
         public FaceProcessor faceProcessor { get; set; }
         public ObservableCollection<ImageInfo> ImageInfos { get; set; }
         public ObservableCollection<ImageInfo> GroupInfos { get; set; }
@@ -380,16 +371,16 @@ namespace FaceFinder
             SetupVisionServices();
         }
 
-        public void SetupVisionServices()
+        private void SetupVisionServices()
         {
             ((App)Application.Current).SetupComputerVisionClient(
                 ComputerVisionKey, ComputerVisionEndpoint);
+            imageProcessor = new ImageProcessor(
+                ((App)Application.Current).computerVisionClient);
+
             ((App)Application.Current).SetupFaceClient(FaceKey, FaceEndpoint);
-
-            computerVisionClient = ((App)Application.Current).computerVisionClient;
-            faceClient = ((App)Application.Current).faceClient;
-
-            faceProcessor = new FaceProcessor();
+            faceProcessor = new FaceProcessor(
+                ((App)Application.Current).faceClient);
         }
 
         private async Task FindFacesAsync()
@@ -427,7 +418,7 @@ namespace FaceFinder
         }
 
         // The root of image processing. Calls all the other image processing methods.
-        public async Task ProcessImageFilesForFacesAsync(
+        private async Task ProcessImageFilesForFacesAsync(
             FileInfo[] imageFiles, CancellationToken cancellationToken)
         {
             string thumbnailsFolder = imageFiles[0].DirectoryName +
@@ -452,17 +443,13 @@ namespace FaceFinder
                 {
                     using (FileStream stream = file.OpenRead())
                     {
-                        faceList = await faceClient.Face.DetectWithStreamAsync(
-                            stream, true, false,
-                            new FaceAttributeType[]
-                                { FaceAttributeType.Age, FaceAttributeType.Gender });
+                        faceList = await faceProcessor.GetFaceListAsync(stream);
                     }
                     if (faceList.Count > 0)
                     {
                         SearchedCount++;
 
                         Guid detectedFaceId = Guid.Empty;
-
                         string attributes = string.Empty;
                         if (displayAttributes)
                         {
@@ -503,7 +490,7 @@ namespace FaceFinder
 
                         if (getThumbnail)
                         {
-                            Task thumbTask = ProcessImageFileForThumbAsync(file, newImage, thumbnailsFolder);
+                            Task thumbTask = imageProcessor.ProcessImageFileForThumbAsync(file, newImage, thumbnailsFolder);
                             tasks.Add(thumbTask);
                         }
                         else
@@ -513,12 +500,12 @@ namespace FaceFinder
                         }
                         if (getCaption)
                         {
-                            Task captionTask = ProcessImageFileForCaptionAsync(file, newImage);
+                            Task captionTask = imageProcessor.ProcessImageFileForCaptionAsync(file, newImage);
                             tasks.Add(captionTask);
                         }
                         if (getOCR)
                         {
-                            Task ocrTask = ProcessImageFileForTextAsync(file, newImage);
+                            Task ocrTask = imageProcessor.ProcessImageFileForTextAsync(file, newImage);
                             tasks.Add(ocrTask);
                         }
 
@@ -549,98 +536,6 @@ namespace FaceFinder
                     break;
                 }
             }
-        }
-
-        // Creates a thumbnail from newImage in the thumbnailsFolder.
-        // Overwrites a file of the same name.
-        private async Task<string> ProcessImageFileForThumbAsync(
-            FileInfo file, ImageInfo newImage, string thumbnailsFolder)
-        {
-            if (!getThumbnail) { return string.Empty; }
-
-            string thumbName = file.Name.Insert(file.Name.Length - 4, "_thumb");
-            string thumbUrl = thumbnailsFolder + Path.DirectorySeparatorChar + thumbName;
-            try
-            {
-                using (FileStream readStream = file.OpenRead(), writeStream = File.Create(thumbUrl))
-                using (var thumbStream = await computerVisionClient.GenerateThumbnailInStreamAsync(
-                            thumbWidth, thumbHeight, readStream, true))
-                {
-                    thumbStream.CopyTo(writeStream);
-                }
-                newImage.ThumbUrl = thumbUrl;
-                return thumbUrl;
-            }
-            catch (ComputerVisionErrorException cve)
-            {
-                Debug.WriteLine("ProcessImageFileForThumbAsync: " + cve.Message);
-                //MessageBox.Show(cve.Message, "ProcessImageFileForThumbAsync");
-                return string.Empty;
-            }
-        }
-
-        private async Task<string> ProcessImageFileForCaptionAsync(
-            FileInfo file, ImageInfo newImage)
-        {
-            if (!getCaption) { return string.Empty; }
-
-            string caption = string.Empty;
-            ImageDescription description;
-            try
-            {
-                using (FileStream stream = file.OpenRead())
-                {
-                    description = await computerVisionClient.DescribeImageInStreamAsync(stream);
-                }
-                if(description.Captions.Count > 0)
-                {
-                    caption = description.Captions[0].Text;
-                }
-                newImage.Caption = caption;
-            }
-            catch (ComputerVisionErrorException cve)
-            {
-                Debug.WriteLine("ProcessImageFileForCaptionAsync: " + cve.Message);
-            }
-            return caption;
-        }
-
-        private async Task<string> ProcessImageFileForTextAsync(
-            FileInfo file, ImageInfo newImage)
-        {
-            if (!getOCR) { return string.Empty; }
-
-            string ocrResult = string.Empty;
-            OcrResult result;
-            try
-            {
-                using (FileStream stream = file.OpenRead())
-                {
-                    result = await computerVisionClient.RecognizePrintedTextInStreamAsync(true, stream);
-                }
-                IList<OcrRegion> regions = result.Regions;
-                if (regions.Count > 0)
-                {
-                    foreach (OcrRegion region in regions)
-                    {
-                        foreach (OcrLine line in region.Lines)
-                        {
-                            foreach (OcrWord word in line.Words)
-                            {
-                                ocrResult += word.Text + " ";
-                            }
-                            break;
-                        }
-                        break;
-                    }
-                    newImage.OcrResult = ocrResult;
-                }
-            }
-            catch (ComputerVisionErrorException cve)
-            {
-                Debug.WriteLine("ProcessImageFileForTextAsync: " + cve.Message);
-            }
-            return ocrResult;
         }
 
         private string GetImageMetadata(FileInfo file, ImageInfo newImage)
@@ -704,7 +599,7 @@ namespace FaceFinder
             await faceProcessor.AddFacesToPersonAsync(SearchedForPerson, items, GroupInfos);
         }
 
-        public void GetDataFromIsolatedStorage()
+        private void GetDataFromIsolatedStorage()
         {
             using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(
                 IsolatedStorageScope.User | IsolatedStorageScope.Assembly, null, null))
