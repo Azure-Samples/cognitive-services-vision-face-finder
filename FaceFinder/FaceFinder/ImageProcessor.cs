@@ -45,7 +45,6 @@ namespace FaceFinder
             catch (ComputerVisionErrorException cve)
             {
                 Debug.WriteLine("ProcessImageFileForThumbAsync: " + cve.Message);
-                //MessageBox.Show(cve.Message, "ProcessImageFileForThumbAsync");
                 return string.Empty;
             }
         }

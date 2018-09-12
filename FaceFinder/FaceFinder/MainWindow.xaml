@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FaceFinder"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Face Finder" Icon="Assets/FaceFinder.ico" Width="1310" Height="900">
+        Title="Face Finder" Width="1310" Height="900">
     <Window.DataContext>
         <local:FaceFinderVM/>
     </Window.DataContext>

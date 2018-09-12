@@ -143,7 +143,7 @@ namespace FaceFinder
 
                 searchedForPerson = people[0];
 
-                // TODO: should call GetTrainingStatusAsync, but here, it throws "Not Found" exception. 
+                // TODO: should call GetTrainingStatusAsync, but here it throws "Not Found" exception. 
                 if (searchedForPerson.PersistedFaceIds.Count > 0)
                 {
                     IsPersonGroupTrained = true;
@@ -212,7 +212,7 @@ namespace FaceFinder
             }
         }
 
-        // Each image should contain only 1 detected face; otherwise must specify face rectangle.
+        // Each image should contain only 1 detected face; otherwise, must specify face rectangle.
         public async Task AddFacesToPersonAsync(string personName,
             IList<ImageInfo> selectedItems, ObservableCollection<ImageInfo> GroupInfos)
         {
@@ -312,6 +312,7 @@ namespace FaceFinder
                 return false;
             }
 
+            // TODO: add Confidence slider
             // Can change using VerifyResult.Confidence.
             // Default: True if similarity confidence is greater than or equal to 0.5.
             return results.IsIdentical;
