@@ -12,7 +12,7 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 * Parses a folder for image files of type bmp, gif, jpg, and png.
 * Processes the image files to detect images containing a face.
-* Displays thumbnails of each image containing a face, along with attributes associated with the image and face.
+* Displays thumbnails of each image that has a face, along with attributes associated with the image and face.
 * Available attributes are:
   * age and gender
   * caption (as a tool tip)
@@ -22,13 +22,13 @@ This sample searches a folder for image files containing a face. Selected attrib
   * age range
   * gender
   * matching person/face
-* Finds all images containing a face that matches a specified person. A "person" is created by selecting one or more known images of the person. Alternatively, the first image of a person found in a folder can be used.
+* Finds all images with a face that matches a specified person.
 
 ## Getting Started
 
 ### Prerequisites
 
-* You need subscription keys for the Computer Vision and Face services to run the sample. You can get free trial subscription keys from [Try Cognitive Services](https://azure.microsoft.com/try/cognitive-services/).
+* You need **subscription keys** for the Computer Vision and Face services to run the sample. You can get free trial subscription keys from [Try Cognitive Services](https://azure.microsoft.com/try/cognitive-services/).
 * Any edition of [Visual Studio 2017](https://www.visualstudio.com/downloads/) with the .NET Desktop application development workload installed.
 
 ### Quickstart
@@ -39,10 +39,50 @@ This sample searches a folder for image files containing a face. Selected attrib
 1. Build the project, which installs the Computer Vision and Face service NuGet packages.
 1. Run the program.
 
+## Walkthrough
+
+Face Finder provides two modes of operation.
+
+The first mode searches a folder for images that contain at least one face and displays information about these images and faces. Searches can be filtered by age range and gender.
+
+To start:
+
 1. Click the expander button on the upper right of the screen.
-1. Insert your valid subscription keys and associated endpoints. The keys and endpoints are stored in **IsolatedStorage**.
-1. Click **Select folder** and browse to a folder that you want to search for images containing faces.
-1. Click **Find faces**, which searches the folder for image files and then analyzes these files for faces. Images found with faces are displayed along with information about the faces. By default, the file name, gender, and age are displayed.
+1. Enter your Computer Vision and Face **subscription keys** in the appropriate text boxes. The keys and endpoints are stored in **IsolatedStorage**.
+1. Click **Select Folder** and browse to a folder containing images that you want to search for faces.
+1. Click **Find Faces**, which searches the folder for image files and then analyzes these files for faces. If you want to stop the search early, click  **Cancel**.
+
+Note: When **Get thumbnail** is selected, a subfolder named *FaceThumbnails* is created under the selected folder to store the thumbnails created by the Computer Vision service.
+
+The following screenshot shows the opening screen with the settings pane opened.
+
+![Opening screenshot](Images/facefinder-opening-screen.png)
+
+The following screenshot shows a search for males between the ages of 50 and 70. Note the tool tip on the third image showing the caption from Computer Vision's analysis of the image.
+
+![Screenshot after filtered search](Images/facefinder-after-search.png)
+
+The second mode additionally filters the images to those with a face that match a specified person.
+
+To filter by person:
+
+1. Type a name for the person in the combo box and click **Add Person**.
+1. Select one or more images of this person, using the Ctrl and Shift keys for multiple selections. Each selected image should contain only one face and the face should be a view showing both eyes.
+1. When selection is complete, click **Add Faces**, which associates the faces with the specified person.
+1. Click **Display** to see the selected images in the left pane.
+1. Select the **Match person** checkbox.
+1. Click **Find Faces** to start the search over again. This time, only images that match the person are displayed.
+
+The following screenshot shows the results after searching for images that match the specified person.
+
+![Screenshot after filtered search](Images/facefinder-person-match.png)
+
+A person and their associated images are persisted. To delete a person and their images:
+
+1. Select the person in the combo box.
+1. Click **Delete**. A confirmation dialog appears for approval.
+
+Images in these screenshots are from [Labeled Faces in the Wild](http://vis-www.cs.umass.edu/lfw/).
 
 ## Resources
 

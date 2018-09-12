@@ -373,14 +373,13 @@ namespace FaceFinder
 
         private void SetupVisionServices()
         {
-            ((App)Application.Current).SetupComputerVisionClient(
-                ComputerVisionKey, ComputerVisionEndpoint);
-            imageProcessor = new ImageProcessor(
-                ((App)Application.Current).computerVisionClient);
+            App app = (App)Application.Current;
 
-            ((App)Application.Current).SetupFaceClient(FaceKey, FaceEndpoint);
-            faceProcessor = new FaceProcessor(
-                ((App)Application.Current).faceClient);
+            app.SetupComputerVisionClient(ComputerVisionKey, ComputerVisionEndpoint);
+            imageProcessor = new ImageProcessor(app.computerVisionClient);
+
+            app.SetupFaceClient(FaceKey, FaceEndpoint);
+            faceProcessor = new FaceProcessor(app.faceClient);
         }
 
         private async Task FindFacesAsync()
