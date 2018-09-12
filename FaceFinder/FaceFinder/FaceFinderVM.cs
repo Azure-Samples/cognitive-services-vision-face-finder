@@ -18,7 +18,7 @@ namespace FaceFinder
 {
     /// <summary>
     /// Processes image files to detect faces, attributes, and other info.
-    /// Dependencies: Computer Vision & Face services.
+    /// Dependencies: ImageProcessor & FaceProcessor.
     /// </summary>
     class FaceFinderVM : ViewModelBase
     {

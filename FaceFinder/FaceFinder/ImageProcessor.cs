@@ -8,9 +8,15 @@ using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
 namespace FaceFinder
 {
+    /// <summary>
+    /// Processes images to read printed text (OCR), determine a caption
+    /// describing the image, and generate a thumbnail of the image.
+    /// Dependencies: Computer Vision service.
+    /// </summary>
     class ImageProcessor
     {
         private readonly IComputerVisionClient computerVisionClient;
+
         private const int thumbWidth = 100, thumbHeight = 100;
 
         public ImageProcessor(IComputerVisionClient computerVisionClient)
@@ -68,6 +74,7 @@ namespace FaceFinder
             return caption;
         }
 
+        // OCR
         public async Task<string> ProcessImageFileForTextAsync(
             FileInfo file, ImageInfo newImage)
         {

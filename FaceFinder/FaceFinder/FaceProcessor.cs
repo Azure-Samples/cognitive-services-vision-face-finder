@@ -12,8 +12,8 @@ using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 namespace FaceFinder
 {
     /// <summary>
-    /// Creates a PersonGroup of a single person to search for in images.
-    /// Processes faces in images to find this person.
+    /// Creates a PersonGroup containing a single person having one or more associated faces.
+    /// Processes faces in images to find matches for this person.
     /// Dependencies: Face service.
     /// </summary>
     class FaceProcessor : ViewModelBase
