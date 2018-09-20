@@ -224,7 +224,7 @@
             </Grid.Resources>
             
             <Button Grid.Row="0" Grid.Column="0" x:Name="selectFolderButton" Content="Select Folder"
-                    ToolTip="containing images to search for faces"
+                    ToolTip="select a folder containing images to search for faces"
                     Command="{Binding SelectFolderCommand}"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Name="fileCountLabel" Text="Files" Style="{StaticResource Row0}"
                        ToolTip="total files in folder"/>
@@ -241,9 +241,9 @@
             <TextBlock Grid.Row="0" Grid.Column="5" Name="searchedLabel" Text="Face Images" Style="{StaticResource Row0}"
                        ToolTip="total image files in folder containing a face"/>
             <TextBlock Grid.Row="0" Grid.Column="6" Name="faceImageCountLabel" Text="Matched Search" Style="{StaticResource Row0}"
-                       ToolTip="total image files matching search criteria"/>
+                       ToolTip="total image files with a face matching the search criteria"/>
             <TextBlock Grid.Row="0" Grid.Column="7" Name="faceCountLabel" Text="Matched Person" Style="{StaticResource Row0}"
-                       ToolTip="total image files matching selected person"/>
+                       ToolTip="total image files with a face matching the search criteria and selected person"/>
 
             <Button Grid.Row="1" Grid.Column="3" x:Name="cancelButtton" Content="Cancel" Margin="12,2,2,2"
                     Command="{Binding CancelFindFacesCommand}"/>
