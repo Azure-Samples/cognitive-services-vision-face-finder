@@ -87,7 +87,7 @@ To filter by person:
 1. Select the **Match person** checkbox.
 1. Click **Find Faces** to start the search over again. This time, only images that match the person are displayed.
 
-The following screenshot shows the results after searching for images that match the specified person. The left panel is open, which shows the images used to define the person. The bottom panel now shows the name you gave the person and the number of matched face images.
+The following screenshot shows the results after searching for images that match the specified person. The images used to define the person are shown in the left pane. In the middle pane, each thumbnail now shows the confidence level that the face does match the person. Images where the confidence is less than 50% aren't considered a match. The bottom panel additionally shows the name you gave the person and the number of matched face images.
 
 ![Screenshot after filtered search](Images/facefinder-person-match.png)
 
