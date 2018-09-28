@@ -277,7 +277,7 @@ namespace FaceFinder
 
         private async Task<IList<string>> GetFaceImagePathsAsync(Person person)
         {
-            IList<string> faceUserData = new List<string>();
+            IList<string> faceImagePaths = new List<string>();
 
             IList<Guid> persistedFaceIds = person.PersistedFaceIds;
             foreach(Guid pfid in persistedFaceIds)
@@ -286,11 +286,21 @@ namespace FaceFinder
                     personGroupId, person.PersonId, pfid);
                 if (!string.IsNullOrEmpty(face.UserData))
                 {
-                    faceUserData.Add(face.UserData);
-                    Debug.WriteLine("GetFaceImagePathsAsync: " + face.UserData);
+                    string imagePath = face.UserData;
+                    if (File.Exists(imagePath))
+                    {
+                        faceImagePaths.Add(imagePath);
+                        Debug.WriteLine("GetFaceImagePathsAsync: " + imagePath);
+                    }
+                    else
+                    {
+                        await faceClient.PersonGroupPerson.DeleteFaceAsync(
+                            personGroupId, person.PersonId, pfid);
+                        Debug.WriteLine("GetFaceImagePathsAsync, file not found, deleting reference: " + imagePath);
+                    }
                 }
             }
-            return faceUserData;
+            return faceImagePaths;
         }
 
         public async Task<bool> MatchFaceAsync(Guid faceId, ImageInfo newImage)
@@ -313,8 +323,8 @@ namespace FaceFinder
             }
 
             // TODO: add Confidence slider
-            // Can change using VerifyResult.Confidence.
             // Default: True if similarity confidence is greater than or equal to 0.5.
+            // Can change by specifying VerifyResult.Confidence.
             return results.IsIdentical;
         }
 
@@ -331,7 +341,8 @@ namespace FaceFinder
             }
         }
 
-        public async Task DeletePersonGroupAsync(string name, ObservableCollection<ImageInfo> GroupInfos, bool askFirst = true)
+        public async Task DeletePersonGroupAsync(
+            string name, ObservableCollection<ImageInfo> GroupInfos, bool askFirst = true)
         {
             if (string.IsNullOrWhiteSpace(name)) { return; }
 
@@ -354,12 +365,10 @@ namespace FaceFinder
             catch (APIErrorException ae)
             {
                 Debug.WriteLine("DeletePersonGroupAsync: " + ae.Message);
-                MessageBox.Show(ae.Message, "DeletePersonGroupAsync");
             }
             catch (Exception e)
             {
                 Debug.WriteLine("DeletePersonGroupAsync: " + e.Message);
-                MessageBox.Show(e.Message, "DeletePersonGroupAsync");
             }
         }
 
