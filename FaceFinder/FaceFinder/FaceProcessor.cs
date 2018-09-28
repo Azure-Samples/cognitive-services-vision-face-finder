@@ -85,7 +85,7 @@ namespace FaceFinder
                 foreach(PersonGroup group in personGroups)
                 {
                     // Remove appended "-group".
-                    personGroupNames.Add(group.Name.Substring(0, group.Name.Length - 6).ToUpper());
+                    personGroupNames.Add(group.Name.Substring(0, group.Name.Length - 6).Replace("_", " "));
                 }
             }
             catch (APIErrorException e)
@@ -107,7 +107,7 @@ namespace FaceFinder
             searchedForPerson = emptyPerson;
             string personName = ConfigurePersonName(name);
             PersonGroupName = personName + "-group";
-            personGroupId = PersonGroupName + "-id";
+            personGroupId = PersonGroupName.ToLower() + "-id";
 
             // Get associated PersonGroup if it exists.
             PersonGroup currentGroup = null;
@@ -169,7 +169,7 @@ namespace FaceFinder
             searchedForPerson = emptyPerson;
             string personName = ConfigurePersonName(name);
             PersonGroupName = personName + "-group";
-            personGroupId = PersonGroupName + "-id";
+            personGroupId = PersonGroupName.ToLower() + "-id";
 
             try
             {
@@ -346,7 +346,7 @@ namespace FaceFinder
         {
             if (string.IsNullOrWhiteSpace(name)) { return; }
 
-            string personGroupId = ConfigurePersonName(name) + "-group-id";
+            string personGroupId = ConfigurePersonName(name).ToLower() + "-group-id";
 
             MessageBoxResult result;
             try
@@ -374,7 +374,7 @@ namespace FaceFinder
 
         private string ConfigurePersonName(string name)
         {
-            return name.Replace(" ", "").ToLower();
+            return name.Replace(" ", "_");
         }
     }
 }
