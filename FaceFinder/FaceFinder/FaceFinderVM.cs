@@ -132,13 +132,6 @@ namespace FaceFinder
             set => SetProperty(ref faceCount, value);
         }
 
-        private bool isSearchedForPersonNotEmpty;
-        public bool IsSearchedForPersonNotEmpty
-        {
-            get => isSearchedForPersonNotEmpty;
-            set => SetProperty(ref isSearchedForPersonNotEmpty, value);
-        }
-
         private string searchedForPerson;
         public string SearchedForPerson
         {
@@ -146,7 +139,7 @@ namespace FaceFinder
             set
             {
                 SetProperty(ref searchedForPerson, value);
-                IsSearchedForPersonNotEmpty = !string.IsNullOrWhiteSpace(searchedForPerson); 
+                AddPersonCommand.Execute(string.Empty);
             }
         }
 
@@ -189,7 +182,6 @@ namespace FaceFinder
             set
             {
                 SetProperty(ref displayAttributes, value);
-                if (!value) { SearchAge = value; }
             }
         }
         private bool getThumbnail = true;
@@ -215,6 +207,13 @@ namespace FaceFinder
         {
             get => getCaption;
             set => SetProperty(ref getCaption, value);
+        }
+
+        private bool showFaces;
+        public bool ShowFaces
+        {
+            get => showFaces;
+            set => SetProperty(ref showFaces, value);
         }
 
         private bool isMale;
@@ -255,7 +254,7 @@ namespace FaceFinder
                 // Populates personComboBox.
                 if ((value && GroupNames.Count == 0) || !value)
                 {
-                    CreateGroupCommand.Execute(string.Empty);
+                    GetNamesCommand.Execute(string.Empty);
                 }
             }
         }
@@ -280,55 +279,71 @@ namespace FaceFinder
             get
             {
                 return selectFolderCommand ??
-                    (selectFolderCommand = new RelayCommand(p => true, p => SelectFolder()));
+                    (selectFolderCommand = new RelayCommand(
+                        p => true, p => SelectFolder()));
             }
         }
 
-        private bool isCreateGroupButtonEnabled = true;
-        private ICommand createGroupCommand;
-        public ICommand CreateGroupCommand
+        private ICommand getNamesCommand;
+        public ICommand GetNamesCommand
         {
             get
             {
-                return createGroupCommand ?? (createGroupCommand = new RelayCommand(
-                    p => isCreateGroupButtonEnabled,
-                    async p => await CreateGroupAndUpdateNamesAsync(searchedForPerson)));
+                return getNamesCommand ??
+                    (getNamesCommand = new RelayCommand(
+                        p => true, async p => await GetPersonNamesAsync()));
             }
-        }
-        private async Task CreateGroupAndUpdateNamesAsync(string person)
-        {
-            await faceProcessor.GetOrCreatePersonGroupAsync(person, GroupInfos);
-            await GetGroupNamesAsync();
         }
 
-        private bool isDeleteGroupButtonEnabled = true;
-        private ICommand deleteGroupCommand;
-        public ICommand DeleteGroupCommand
+        private bool isAddPersonButtonEnabled = true;
+        private ICommand addPersonCommand;
+        public ICommand AddPersonCommand
         {
             get
             {
-                return deleteGroupCommand ?? (deleteGroupCommand = new RelayCommand(
-                    p => isDeleteGroupButtonEnabled, 
-                    async p => await DeleteAsync()));
+                return addPersonCommand ?? (addPersonCommand = new RelayCommand(
+                    p => isAddPersonButtonEnabled,
+                    async p => await AddPersonAsync(searchedForPerson)));
             }
         }
-        private async Task DeleteAsync()
+        private async Task AddPersonAsync(string person)
         {
-            await faceProcessor.DeletePersonGroupAsync(searchedForPerson, GroupInfos);
+            await faceProcessor.GetOrCreatePersonAsync(person, GroupInfos);
+
+            // Disable person matching if PersonGroup not trained for this person
+            if (!faceProcessor.IsPersonGroupTrained) { MatchPerson = false; }
+
+            await GetPersonNamesAsync();
+        }
+
+        private bool isDeletePersonButtonEnabled = true;
+        private ICommand deletePersonCommand;
+        public ICommand DeletePersonCommand
+        {
+            get
+            {
+                return deletePersonCommand ?? (deletePersonCommand = new RelayCommand(
+                    p => isDeletePersonButtonEnabled, 
+                    async p => await DeletePersonAsync(searchedForPerson)));
+            }
+        }
+        private async Task DeletePersonAsync(string person)
+        {
+            await faceProcessor.DeletePersonAsync(GroupInfos, GroupNames);
             if (GroupNames.Contains(searchedForPerson))
             {
                 GroupNames.Remove(searchedForPerson);
             }
         }
 
-        private bool isAddToGroupButtonEnabled = true;
+        private bool isAddToPersonButtonEnabled = true;
         private ICommand addToPersonCommand;
         public ICommand AddToPersonCommand
         {
             get
             {
                 return addToPersonCommand ?? (addToPersonCommand = new RelayCommand(
-                    p => isAddToGroupButtonEnabled,
+                    p => isAddToPersonButtonEnabled,
                     async p => await AddToPersonAsync(p)));
             }
         }
@@ -354,7 +369,7 @@ namespace FaceFinder
                         p => isCancelButtonEnabled, p => CancelFindFaces()));
             }
         }
-        #endregion Commands
+    #endregion Commands
 
         public ImageProcessor imageProcessor { get; set; }
         public FaceProcessor faceProcessor { get; set; }
@@ -416,7 +431,7 @@ namespace FaceFinder
             cancellationTokenSource.Cancel();
         }
 
-        // The root of image processing. Calls all the other image processing methods.
+        // The root of image processing. Calls all the other image processing methods when a face is detected.
         private async Task ProcessImageFilesForFacesAsync(
             FileInfo[] imageFiles, CancellationToken cancellationToken)
         {
@@ -427,10 +442,10 @@ namespace FaceFinder
                 Directory.CreateDirectory(thumbnailsFolder);
             }
 
-            ProcessingCount = 0;
-            SearchedCount = 0;
-            FaceCount = 0;
-            FaceImageCount = 0;
+            ProcessingCount = 0;    // # of image files processed
+            SearchedCount = 0;      // images containing a face
+            FaceImageCount = 0;     // images with a face matching the search criteria
+            FaceCount = 0;          // images with a face matching the search criteria and selected person
 
             IList<DetectedFace> faceList;
             foreach (FileInfo file in imageFiles)
@@ -444,46 +459,53 @@ namespace FaceFinder
                     {
                         faceList = await faceProcessor.GetFaceListAsync(stream);
                     }
+
+                    // Ignore image files without a detected face
                     if (faceList.Count > 0)
                     {
                         SearchedCount++;
+                        int matchedCount = 0;
 
-                        Guid detectedFaceId = Guid.Empty;
-                        string attributes = string.Empty;
-                        if (displayAttributes)
-                        {
-                            foreach (DetectedFace face in faceList)
-                            {
-                                detectedFaceId = (Guid)face.FaceId;
-                                double? age = face.FaceAttributes.Age;
-                                string gender = face.FaceAttributes.Gender.ToString();
-
-                                if (searchAge && ( (age < MinAge) || (age > MaxAge) )) { continue; }
-                                if (isMale && !gender.Equals(male)) { continue; }
-                                if (isFemale && !gender.Equals(female)) { continue; }
-                                attributes += gender + " " + age + "   ";
-                            }
-                            if (attributes.Equals(string.Empty)) { continue; }
-                        }
-
+                        // Holds info about the currently analyzed image file and detected
                         ImageInfo newImage = new ImageInfo();
                         newImage.FilePath = file.DirectoryName + Path.DirectorySeparatorChar + file.Name;
                         newImage.FileName = file.Name;
-                        newImage.Attributes = attributes;
 
                         if (getMetadata)
                         {
                             GetImageMetadata(file, newImage);
                         }
 
-                        FaceImageCount++;
+                        string attributes = string.Empty;
+                        bool isImageMatch = false;
 
-                        // If match on face, call faceProcessor
-                        if (MatchPerson && faceProcessor.IsPersonGroupTrained)
+                        foreach (DetectedFace face in faceList)
                         {
-                            bool isFaceMatch = await faceProcessor.MatchFaceAsync(detectedFaceId, newImage);
-                            if (!isFaceMatch) { continue; }
+                            double? age = face.FaceAttributes.Age;
+                            string gender = face.FaceAttributes.Gender.ToString();
+
+                            if (searchAge && ((age < MinAge) || (age > MaxAge))) { continue; }
+                            if (isMale && !gender.Equals(male)) { continue; }
+                            if (isFemale && !gender.Equals(female)) { continue; }
+                            attributes += gender + " " + age + "   ";
+
+                            matchedCount++;
+
+                            // If match on face, call faceProcessor
+                            if (MatchPerson && faceProcessor.IsPersonGroupTrained)
+                            {
+                                bool isFaceMatch = await faceProcessor.MatchFaceAsync(
+                                    (Guid)face.FaceId, newImage);
+                                isImageMatch |= isFaceMatch;
+                            }
                         }
+
+                        // No faces matched search criteria
+                        if (matchedCount == 0) { continue; }
+                        if (MatchPerson && !isImageMatch) { continue; }
+
+                        newImage.Attributes = attributes;
+                        FaceImageCount += matchedCount;
 
                         var tasks = new List<Task>();
 
@@ -575,10 +597,10 @@ namespace FaceFinder
         }
 
         // Called by IsPersonComboBoxOpen setter
-        private async Task GetGroupNamesAsync()
+        private async Task GetPersonNamesAsync()
         {
-            IList<string> groupNames = await faceProcessor.GetAllPersonGroupNamesAsync();
-            foreach (string name in groupNames)
+            IList<string> personNames = await faceProcessor.GetAllPersonNamesAsync();
+            foreach (string name in personNames)
             {
                 if (!GroupNames.Contains(name))
                 {
@@ -595,7 +617,8 @@ namespace FaceFinder
             if(selectedItems.Count == 0) { return; }
 
             IList<ImageInfo> items = selectedItems.Cast<ImageInfo>().ToList();
-            await faceProcessor.AddFacesToPersonAsync(SearchedForPerson, items, GroupInfos);
+            await faceProcessor.AddFacesToPersonAsync(items, GroupInfos);
+            ShowFaces = true;
         }
 
         private void GetDataFromIsolatedStorage()

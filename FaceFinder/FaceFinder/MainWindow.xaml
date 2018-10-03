@@ -14,8 +14,8 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         
-        <!-- groupList -->
-        <DataTemplate x:Key="GroupTemplate" DataType="ImageInfo">
+        <!-- personFaceList -->
+        <DataTemplate x:Key="PersonFaceTemplate" DataType="ImageInfo">
             <StackPanel Orientation="Vertical"
                         HorizontalAlignment="Center" VerticalAlignment="Center" Width="120">
                 <Image x:Name="personThumbNail" Height="120" Stretch="UniformToFill">
@@ -31,7 +31,7 @@
         <DataTemplate x:Key="ImageInfoTemplate" DataType="ImageInfo">
             <StackPanel Orientation="Vertical" ToolTip="{Binding Caption}"
                         HorizontalAlignment="Center" VerticalAlignment="Center" Width="100">
-                <Image x:Name="thumbNail" Width="100" Height="100" Margin="0" Stretch="UniformToFill"
+                <Image x:Name="thumbNail" Width="100" Height="100" Margin="0,2,0,0" Stretch="UniformToFill"
                        Visibility="{Binding ElementName=getThumbnail, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Image.Source>
                         <BitmapImage CacheOption="OnLoad" UriSource="{Binding ThumbUrl}"/>
@@ -66,10 +66,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox Name="groupList" Grid.Row="0" Grid.Column="0" Width="134" Margin="6,4,4,4"
+        <ListBox Name="personFaceList" Grid.Row="0" Grid.Column="0" Width="134" Margin="6,4,4,4"
                  Visibility="{Binding ElementName=showFaces, Path=IsChecked, Converter={StaticResource BoolToVisibilityConverter}}"
                  ItemsSource="{Binding GroupInfos}"
-                 ItemTemplate="{StaticResource GroupTemplate}"
+                 ItemTemplate="{StaticResource PersonFaceTemplate}"
                  HorizontalAlignment="Center"/>
 
         <Image Name="splashImage" Grid.Row="0" Grid.Column="1" Margin="4"
@@ -118,8 +118,7 @@
                     </StackPanel>
 
                     <CheckBox x:Name="searchAge" Margin="0,10,0,8" Content="Search on age range"
-                              IsChecked="{Binding SearchAge, Mode=TwoWay}" 
-                              IsEnabled="{Binding ElementName=displayAttributes, Path=IsChecked, Mode=OneWay}"/>
+                              IsChecked="{Binding SearchAge, Mode=TwoWay}"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <TextBlock Width="14">
                             <TextBlock.Text>
@@ -151,9 +150,9 @@
                               SelectedItem="{Binding SearchedForPerson}" IsDropDownOpen="{Binding IsPersonComboBoxOpen}"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" HorizontalAlignment="Center">
-                        <Button x:Name="createGroupButton" Content="Add Person" Command="{Binding CreateGroupCommand}"
+                        <Button x:Name="addPersonButton" Content="Add Person" Command="{Binding AddPersonCommand}"
                                 HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
-                        <Button x:Name="deleteGroupButton" Content="Delete Person" Command="{Binding DeleteGroupCommand}" Margin="16,0,0,0"
+                        <Button x:Name="deletePersonButton" Content="Delete Person" Command="{Binding DeletePersonCommand}" Margin="16,0,0,0"
                                 IsEnabled="{Binding IsSearchedForPersonNotEmpty}"
                                 ToolTip="opens confirmation dialog"
                                 HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
@@ -169,7 +168,7 @@
                                 Command="{Binding AddToPersonCommand}" CommandParameter="{Binding ElementName=thumbList, Path=SelectedItems}"
                                 IsEnabled="{Binding IsSearchedForPersonNotEmpty}"
                                 HorizontalAlignment="Center" VerticalAlignment="Top" FontWeight="Bold" Padding="4,2" Background="Bisque"/>
-                        <CheckBox x:Name="showFaces" Content="Display"
+                        <CheckBox x:Name="showFaces" Content="Display" IsChecked="{Binding ShowFaces}"
                               Margin="36,0,0,0" Width="Auto" VerticalAlignment="Center"/>
                     </StackPanel>
 
