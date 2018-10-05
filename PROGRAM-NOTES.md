@@ -23,9 +23,9 @@ Face calls:
 
 ## Service notes
 
-Each training image should contain only one detected face; otherwise, the rectangle delineating the face to match must be specified.
+Each training image should contain only one detected face; otherwise, the rectangle delineating the face to match would have to be specified.
 
-The default confidence level for a matching face is `VerifyResult.Confidence` = 0.5.
+The default confidence level for a matching face is `VerifyResult.Confidence` = 0.5. This value can be changed in the `FaceProcessor.MatchFaceAsync` method.
 
 Face entities (`PersonGroup, Person, PersistedFace`) aren't fully formed after a method call and MUST be requeried to get all property values. For example:
 
@@ -45,7 +45,7 @@ samePerson.UserData: personUserData
 
 ## Misc
 
-Subscription keys are persisted in plain text in [IsolatedStorage](https://docs.microsoft.com/dotnet/standard/io/isolated-storage?view=netframework-4.7.2). On Windows 10 and Windows 7, the location is *<SYSTEMDRIVE>\Users\<user>\AppData\Local*. IsolatedStorage keeps the keys out of program code but isn't secure.
+Subscription keys and endpoints are persisted in plain text in [IsolatedStorage](https://docs.microsoft.com/dotnet/standard/io/isolated-storage?view=netframework-4.7.2). On Windows 10 and Windows 7, the location is *<SYSTEMDRIVE>\Users\<user>\AppData\Local*. IsolatedStorage keeps the keys out of program code but isn't secure.
 
 Image files are processed and displayed by image type (bitmap, gif, jpg, png) in the order specified in the `GetImageFiles` method.
 

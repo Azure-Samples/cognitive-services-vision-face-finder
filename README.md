@@ -18,6 +18,7 @@ This sample searches a folder for image files containing a face. Selected attrib
   * caption (as a tool tip)
   * printed character recognition (OCR)
   * date image taken and title, if available
+  * The sample can be easily extended to display additional attributes such as handwritten text and object identification.
 * Image files can be filtered on:
   * age range
   * gender
@@ -50,7 +51,7 @@ To start:
 
 1. Click the expander button on the upper right of the screen.
 1. Enter your Computer Vision and Face **subscription keys** in the appropriate text boxes.
-1. Change the service endpoints to match the region associated with your subscription keys, if necessary. The keys and endpoints are stored in **IsolatedStorage**, which persist between program runs.
+1. The default **endpoint** for both services is `https://westcentralus.api.cognitive.microsoft.com`. Change the service endpoints to match the region associated with your subscription keys, if necessary. Note that the new Vision services client libraries automatically add the service name and method to the endpoint.
 1. Select the search criteria. The **Match person** checkbox is disabled until a person is specified in the bottom section of the pane (described below).
 1. Click **Select Folder** and browse to a local folder containing images that you want to search for faces.
     * Valid image file types are bmp, gif, jpg, and png.
