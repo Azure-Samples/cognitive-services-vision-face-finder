@@ -1,7 +1,9 @@
 ---
-services: cognitive-services, computer vision, face
-platforms: dotnet, c#
-author: easyj2j
+languages: []
+page_type: sample
+products:
+- azure
+- azure-cognitive-services
 ---
 
 # Face Finder
