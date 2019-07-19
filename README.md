@@ -111,3 +111,4 @@ Images in these screenshots are a collated collection from [Labeled Faces in the
 * [Face service documentation](https://docs.microsoft.com/azure/cognitive-services/face/)
 * [Face API](https://docs.microsoft.com/azure/cognitive-services/face/apireference)
 * [Microsoft.Azure.CognitiveServices.Vision.Face 2.2.0-preview](https://www.nuget.org/packages/Microsoft.Azure.CognitiveServices.Vision.Face/2.2.0-preview) client library NuGet package
+
