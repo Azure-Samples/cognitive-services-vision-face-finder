@@ -33,7 +33,7 @@ This sample searches a folder for image files containing a face. Selected attrib
 
 ### Prerequisites
 
-* You need **subscription keys** for the Computer Vision and Face services to run the sample. You can get free trial subscription keys from [Try Cognitive Services](https://azure.microsoft.com/try/cognitive-services/).
+* You need **subscription keys** for the Computer Vision and Face services to run the sample. [Create a new Azure account, and try Cognitive Services for free.](https://azure.microsoft.com/free/cognitive-services/)
 * Any edition of [Visual Studio 2017](https://www.visualstudio.com/downloads/) with the .NET Desktop application development workload installed.
 * A folder containing image files with faces. To ideally demonstrate the person matching feature, the folder should contain multiple images of the specified person.
 
