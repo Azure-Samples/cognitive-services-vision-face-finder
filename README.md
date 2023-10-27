@@ -5,7 +5,7 @@ page_type: sample
 description: "This sample searches a folder for image files containing a face."
 products:
 - azure
-- azure-cognitive-services
+- ai-services
 ---
 
 # Face Finder
